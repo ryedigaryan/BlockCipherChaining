@@ -13,4 +13,12 @@
     <artifactId>chaintypes</artifactId>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>rub.labs</groupId>
+            <artifactId>cryptoalgo</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 </project>
