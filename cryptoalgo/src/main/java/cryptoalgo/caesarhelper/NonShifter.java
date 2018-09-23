@@ -1,4 +1,4 @@
-package caesarhelper;
+package cryptoalgo.caesarhelper;
 
 public class NonShifter implements ByteShifter {
 

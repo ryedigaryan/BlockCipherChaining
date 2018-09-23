@@ -10,6 +10,7 @@
     <modules>
         <module>chaintypes</module>
         <module>cryptoalgo</module>
+        <module>test</module>
     </modules>
     <packaging>pom</packaging>
 

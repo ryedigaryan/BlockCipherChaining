@@ -1,6 +1,8 @@
-import caesarhelper.ByteShifter;
-import caesarhelper.LetterShifter;
-import caesarhelper.NonShifter;
+package cryptoalgo;
+
+import cryptoalgo.caesarhelper.ByteShifter;
+import cryptoalgo.caesarhelper.LetterShifter;
+import cryptoalgo.caesarhelper.NonShifter;
 
 public class CaesarCipher extends EncryptionAlgorithm<Byte> {
 
@@ -38,17 +40,17 @@ public class CaesarCipher extends EncryptionAlgorithm<Byte> {
             shift = (byte)(SYMBOL_MAX + shift);
         // shift the bytes(symbols)
         for (int i = 0, bytesLength = bytes.length; i < bytesLength; i++) {
-            byte shiftable = bytes[i];
+            byte currentByte = bytes[i];
             // pick up shifter logic
             ByteShifter shifter;
-            if(isUpperCase(shiftable))
+            if(isUpperCase(currentByte))
                 shifter = upperShifter;
-            else if(isLowerCase(shiftable))
+            else if(isLowerCase(currentByte))
                 shifter = lowerShifter;
             else
                 shifter = nonShifter;
             // apply shifter logic
-            result[i] = shifter.shift(shiftable, shift);
+            result[i] = shifter.shift(currentByte, shift);
         }
         return result;
     }

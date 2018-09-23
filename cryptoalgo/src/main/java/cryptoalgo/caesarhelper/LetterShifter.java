@@ -1,4 +1,4 @@
-package caesarhelper;
+package cryptoalgo.caesarhelper;
 
 public class LetterShifter implements ByteShifter {
 

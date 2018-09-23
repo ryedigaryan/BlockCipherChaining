@@ -1,3 +1,5 @@
+package cryptoalgo;
+
 public abstract class EncryptionAlgorithm<KeyType> implements Cipher {
 
     KeyType key;
