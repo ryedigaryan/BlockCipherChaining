@@ -31,20 +31,24 @@ public class CaesarCipher extends EncryptionAlgorithm<Byte> {
      * @param shift must be in range 0..25
      */
     private static byte[] shift(byte[] bytes, byte shift) {
-        if(shift < 0) {
-            shift = (byte) (SYMBOL_MAX + shift);
-        }
+        // the result, which will be returned
         byte[] result = new byte[bytes.length];
+        // convert negative shift to positive
+        if(shift < 0)
+            shift = (byte)(SYMBOL_MAX + shift);
+        // shift the bytes(symbols)
         for (int i = 0, bytesLength = bytes.length; i < bytesLength; i++) {
-            byte plainByte = bytes[i];
+            byte shiftable = bytes[i];
+            // pick up shifter logic
             ByteShifter shifter;
-            if(isUpperCase(plainByte))
+            if(isUpperCase(shiftable))
                 shifter = upperShifter;
-            else if(isLowerCase(plainByte))
+            else if(isLowerCase(shiftable))
                 shifter = lowerShifter;
             else
                 shifter = nonShifter;
-            result[i] = shifter.shift(plainByte, shift);
+            // apply shifter logic
+            result[i] = shifter.shift(shiftable, shift);
         }
         return result;
     }
