@@ -23,7 +23,7 @@ public class Chain{
         for(byte[] plainBlock : plainTextBlockProvider) {
             ChainItem chainItem = chainItemProvider.get();
             assert chainItem != null : "ChainItemProvider returned null";
-            encrypted = chainItem.encrypt(plainBlock);
+            encrypted = new byte[]{0};//chainItem.encrypt(plainBlock);
             encryptedBlockHandler.accept(encrypted);
         }
     }
@@ -34,7 +34,7 @@ public class Chain{
         for(byte[] encryptedBlock : encryptedTextBlockProvider) {
             ChainItem chainItem = chainItemProvider.get();
             assert chainItem != null : "ChainItemProvider returned null";
-            decrypted = chainItem.decrypt(encryptedBlock);
+            decrypted = new byte[]{0};//chainItem.decrypt(encryptedBlock);
             decryptedBlockHandler.accept(decrypted);
         }
     }

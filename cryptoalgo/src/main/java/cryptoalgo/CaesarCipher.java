@@ -4,75 +4,121 @@ import cryptoalgo.caesarhelper.ByteShifter;
 import cryptoalgo.caesarhelper.LetterShifter;
 import cryptoalgo.caesarhelper.NonShifter;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class CaesarCipher extends EncryptionAlgorithm<Byte> {
 
     private static final byte UPPERCASE_MIN = 'A';
     private static final byte UPPERCASE_MAX = 'Z';
     private static final byte LOWERCASE_MIN = 'a';
     private static final byte LOWERCASE_MAX = 'z';
-    private static final byte KEY_MAX       = 'z' - 'a' + 1;
+    private static final byte KEY_MIN       = 0; // included
+    private static final byte KEY_MAX       = 'z' - 'a' + 1; // excluded
     private static final byte SYMBOL_MAX    = KEY_MAX;
 
     private static final ByteShifter upperShifter = new LetterShifter(UPPERCASE_MIN, SYMBOL_MAX);
     private static final ByteShifter lowerShifter = new LetterShifter(LOWERCASE_MIN, SYMBOL_MAX);
     private static final ByteShifter nonShifter   = new NonShifter();
 
-    public CaesarCipher(Long key) {
-        super((byte)(key % KEY_MAX));
+    public CaesarCipher(long key) {
+        super.setKey(normalizeKey(key));
     }
 
-    public byte[] encrypt(byte[] message) {
-        return shift(message, key);
-    }
-
-    public byte[] decrypt(byte[] encrypted) {
-        return shift(encrypted, (byte)-key);
+    @Override
+    public void setKey(Byte key) {
+        super.setKey(normalizeKey(key));
     }
 
     /**
-     * @param shift must be in range 0..25
+     * {@inheritDoc}
      */
-    private static byte[] shift(byte[] bytes, byte shift) {
-        // the result, which will be returned
-        byte[] result = new byte[bytes.length];
-        // convert negative shift to positive
-        if(shift < 0)
-            shift = (byte)(SYMBOL_MAX + shift);
-        // shift the bytes(symbols)
-        for (int i = 0, bytesLength = bytes.length; i < bytesLength; i++) {
-            byte currentByte = bytes[i];
-            // pick up shifter logic
-            ByteShifter shifter;
-            if(isUpperCase(currentByte))
-                shifter = upperShifter;
-            else if(isLowerCase(currentByte))
-                shifter = lowerShifter;
-            else
-                shifter = nonShifter;
-            // apply shifter logic
-            result[i] = shifter.shift(currentByte, shift);
-        }
-        return result;
+    public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
+        encrypt(openDataIS, encryptedDataOS, key);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
+        encrypt(encryptedDataIS, openDataOS, decryptionKey());
+    }
+
+    /**
+     * Constructs decryption key from encryption key.
+     * @return key, used in decryption.
+     */
+    private byte decryptionKey() {
+        return (byte)(SYMBOL_MAX - key);
+    }
+
+    /**
+     * Normalizes given key, and returns normalized.<br>
+     *     In other words, this function fits key in range [0, 26)
+     * @param key the key, which must be normalized.
+     * @return normalized key.
+     */
+    private static byte normalizeKey(long key) {
+        if(KEY_MIN <= key && key < KEY_MAX)
+            return (byte)key;
+        // convert key to fit in acceptable range
+        long inRange = key % KEY_MAX;
+        // if key is negative, then convert it to positive
+        if(inRange < 0) {
+            return (byte)(KEY_MAX + inRange);
+        }
+        return (byte)inRange;
+    }
+
+    /**
+     * Encrypts given input using given key, and writes the encrypted data into given output.
+     * @param input input, which must be encrypted
+     * @param output output, where the encrypted data must be written
+     * @param key encryption key
+     * @throws IOException input and output streams can throw this exception
+     */
+    private static void encrypt(InputStream input, OutputStream output, byte key) throws IOException {
+        int openByte;
+        while((openByte = input.read()) != -1) {
+            byte encryptedByte = shift((byte)openByte, key);
+            output.write(encryptedByte);
+        }
+    }
+
+    /**
+     * @param letter letter which must be encrypted
+     * @param positiveShift must be in range 0..25
+     */
+    private static byte shift(byte letter, byte positiveShift) {
+        // pick up shifter logic
+        ByteShifter shifter;
+        if(isUpperCase(letter))
+            shifter = upperShifter;
+        else if(isLowerCase(letter))
+            shifter = lowerShifter;
+        else
+            shifter = nonShifter;
+        // apply shifter logic
+        return shifter.shift(letter, positiveShift);
+    }
+
+    /**
+     * Checks whether the symbol is uppercase english letter or not.
+     * @param symbol symbol, which must be checked.
+     * @return true - if {@code symbol} is uppercase english letter, false - otherwise
+     */
     private static boolean isUpperCase(byte symbol) {
         return UPPERCASE_MIN <= symbol && symbol <= UPPERCASE_MAX;
     }
 
+    /**
+     * Checks whether the symbol is lower english letter or not.
+     * @param symbol symbol, which must be checked.
+     * @return true - if {@code symbol} is lower english letter, false - otherwise
+     */
     private static boolean isLowerCase(byte symbol) {
         return LOWERCASE_MIN <= symbol && symbol <= LOWERCASE_MAX;
-    }
-
-    // tests
-    public static void main(String[] args) {
-        String plain = "abcd, efgh ijkl mnop - qrst uvw xyz **ABCD EFGH I#JKL) MNOP QRST UVW XYZ1234";
-        String expect = "efgh, ijkl mnop qrst - uvwx yza bcd **EFGH IJKL M#NOP) QRST UVWX YZA BCD1234";
-        CaesarCipher cc = new CaesarCipher(30L);
-        byte[] encrypted = cc.encrypt(plain.getBytes());
-        System.out.println("encrypted: " + new String(encrypted));
-        assert expect.equals(new String(encrypted)) : "WRONG ENcryption";
-        byte[] decrypted = cc.decrypt(encrypted);
-        System.out.println("decrypted: " + new String(decrypted));
-        assert plain.equals(new String(decrypted)) : "WRONG DEcryption";
     }
 }
