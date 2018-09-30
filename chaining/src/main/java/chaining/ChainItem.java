@@ -4,18 +4,13 @@ import chaining.helper.BlockCrypterKeyProvider;
 
 import java.util.function.Consumer;
 
-public class ChainItem<KeyType> implements BlockCrypterKeyProvider<KeyType> {
+public class ChainItem<KeyType> {
     private BlockCrypter<KeyType> blockCrypter;
     private int executionCount;
-    private KeyType[] keys;
 
-    public ChainItem(BlockCrypter<KeyType> blockCrypter, int executionCount, KeyType[] keys) {
-        if(keys.length != executionCount) {
-            throw new IllegalArgumentException("ChainItem keys.length must be equal to executionCount");
-        }
-        blockCrypter.setKeyProvider(this);
+    public ChainItem(BlockCrypter<KeyType> blockCrypter, int executionCount, BlockCrypterKeyProvider<KeyType> keyProvider) {
+        blockCrypter.setKeyProvider(keyProvider);
         this.blockCrypter = blockCrypter;
-        this.keys = keys;
         this.executionCount = executionCount;
     }
 
@@ -47,10 +42,5 @@ public class ChainItem<KeyType> implements BlockCrypterKeyProvider<KeyType> {
         while(--execCount >= 0) {
             action.run();
         }
-    }
-
-    @Override
-    public KeyType getKey(int blockNumber) {
-        return keys[blockNumber];
     }
 }
