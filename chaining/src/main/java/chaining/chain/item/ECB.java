@@ -1,4 +1,4 @@
 package chaining.chain.item;
 
-public class EBC {
+public class ECB {
 }
