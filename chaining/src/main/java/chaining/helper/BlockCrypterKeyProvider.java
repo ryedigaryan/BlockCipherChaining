@@ -1,5 +1,5 @@
 package chaining.helper;
 
-public interface BlockCrypterKeyProvider<KeyType> {
-    KeyType getKey(int blockNumber);
+public interface BlockCrypterKeyProvider<K> {
+    K getKey(int blockNumber);
 }

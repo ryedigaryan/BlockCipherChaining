@@ -5,15 +5,18 @@ import chaining.helper.BlockCrypterKeyProvider;
 import chaining.helper.BlockCrypterVectorProvider;
 import cryptoalgo.EncryptionAlgorithm;
 
-public abstract class BlockCrypter<KeyType> extends EncryptionAlgorithm<KeyType> implements BlockCrypterKeyProvider {
-    private BlockCrypterKeyProvider<KeyType> keyProvider;
+public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements BlockCrypterKeyProvider {
+    protected EncryptionAlgorithm<K> algorithm;
+
+    private BlockCrypterKeyProvider<K> keyProvider;
     private BlockCrypterVectorProvider vectorProvider;
     //TODO: do not forget to call delegate.setNextBlockVector
     private BlockCrypterDelegate delegate;
 
     private int cryptableBlockSize;
 
-    public BlockCrypter(EncryptionAlgorithm<KeyType> rootAlgorithm, int cryptableBlockSize) {
+    public BlockCrypter(EncryptionAlgorithm<K> rootAlgorithm, int cryptableBlockSize) {
+        this.algorithm = rootAlgorithm;
         this.cryptableBlockSize = cryptableBlockSize;
     }
 
@@ -21,7 +24,7 @@ public abstract class BlockCrypter<KeyType> extends EncryptionAlgorithm<KeyType>
         return cryptableBlockSize;
     }
 
-    public void setKeyProvider(BlockCrypterKeyProvider<KeyType> keyProvider) {
+    public void setKeyProvider(BlockCrypterKeyProvider<K> keyProvider) {
         this.keyProvider = keyProvider;
     }
 

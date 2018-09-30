@@ -1,14 +1,18 @@
 package cryptoalgo;
 
-public abstract class EncryptionAlgorithm<KeyType> implements Cipher {
+/**
+ * Encryption Algorithm base class.
+ * @param <K> the type of key of algorithm.
+ */
+public abstract class EncryptionAlgorithm<K> implements Cipher {
 
-    KeyType key;
+    K key;
 
-    public void setKey(KeyType key) {
+    public void setKey(K key) {
         this.key = key;
     }
 
-    public KeyType getKey() {
+    public K getKey() {
         return key;
     }
 }

@@ -1,4 +1,10 @@
 package chaining.chain.item;
 
-public class CBC {
+import chaining.BlockCrypter;
+import chaining.helper.BlockCrypterKeyProvider;
+
+public class CBC<K> extends ChainItem<K> {
+    public CBC(BlockCrypter<K> blockCrypter, int executionCount, BlockCrypterKeyProvider<K> keyProvider) {
+        super(blockCrypter, executionCount, keyProvider);
+    }
 }

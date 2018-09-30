@@ -5,17 +5,17 @@ import chaining.helper.BlockCrypterKeyProvider;
 
 import java.util.function.Consumer;
 
-public class ChainItem<KeyType> {
-    private BlockCrypter<KeyType> blockCrypter;
+public class ChainItem<K> {
+    private BlockCrypter<K> blockCrypter;
     private int executionCount;
 
-    public ChainItem(BlockCrypter<KeyType> blockCrypter, int executionCount, BlockCrypterKeyProvider<KeyType> keyProvider) {
+    public ChainItem(BlockCrypter<K> blockCrypter, int executionCount, BlockCrypterKeyProvider<K> keyProvider) {
         blockCrypter.setKeyProvider(keyProvider);
         this.blockCrypter = blockCrypter;
         this.executionCount = executionCount;
     }
 
-    public BlockCrypter<KeyType> getBlockCrypter() {
+    public BlockCrypter<K> getBlockCrypter() {
         return blockCrypter;
     }
 
@@ -23,7 +23,7 @@ public class ChainItem<KeyType> {
         return executionCount;
     }
 
-    public void setBlockCrypter(BlockCrypter<KeyType> blockCrypter) {
+    public void setBlockCrypter(BlockCrypter<K> blockCrypter) {
         this.blockCrypter = blockCrypter;
     }
 
