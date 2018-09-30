@@ -7,12 +7,14 @@
     <groupId>rub.labs</groupId>
     <artifactId>chaincrypt</artifactId>
     <version>1.0-SNAPSHOT</version>
+
     <modules>
         <module>chaining</module>
         <module>cryptoalgo</module>
         <module>test</module>
         <module>helpers</module>
     </modules>
+
     <packaging>pom</packaging>
 
 </project>

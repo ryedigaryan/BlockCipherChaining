@@ -1,5 +1,6 @@
-package chaining;
+package chaining.chain.item;
 
+import chaining.BlockCrypter;
 import chaining.helper.BlockCrypterKeyProvider;
 
 import java.util.function.Consumer;

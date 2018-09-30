@@ -1,5 +1,6 @@
-package chaining;
+package chaining.chain;
 
+import chaining.chain.item.ChainItem;
 import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterVectorProvider;
 import cryptoalgo.Cipher;
