@@ -121,4 +121,20 @@ public class CaesarCipher extends EncryptionAlgorithm<Byte> {
     private static boolean isLowerCase(byte symbol) {
         return LOWERCASE_MIN <= symbol && symbol <= LOWERCASE_MAX;
     }
+
+    @Override
+    public int hashCode() {
+        return key.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        if(obj instanceof CaesarCipher) {
+            return key.equals(((CaesarCipher)obj).key);
+        }
+        return false;
+    }
 }

@@ -1,41 +1,73 @@
 package chaining;
 
-import chaining.helper.ChainItemProvider;
+import chaining.helper.BlockCrypterDelegate;
+import chaining.helper.BlockCrypterVectorProvider;
+import cryptoalgo.Cipher;
+import helpers.handlers.LambdaHelper;
 
-import java.util.function.Consumer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-public class Chain{
-    private final String name;
-    private ChainItemProvider chainItemProvider;
+public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, Cipher {
+    private int currentBlockCrypterNumber;
+    private ArrayList<byte[]> vectors;
+    private ChainItem[] chainItems;
 
-    private Chain(String name, ChainItemProvider chainItemProvider) {
-        this.name = name;
-        this.chainItemProvider = chainItemProvider;
+    public Chain(byte[] initialVector, ChainItem... chainItems) {
+        this.chainItems = chainItems;
+        // 1st(at 0 index) is the initialVector
+        int blocksCount = 1 + Arrays.stream(chainItems)
+                .mapToInt(chainItem -> {
+                    chainItem.getBlockCrypter().setVectorProvider(this);
+                    chainItem.getBlockCrypter().setDelegate(this);
+                    return chainItem.getExecutionCount();
+                })
+                .sum();
+        vectors = new ArrayList<>(blocksCount);
+        vectors.add(initialVector);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void encrypt(Iterable<byte[]> plainTextBlockProvider, Consumer<byte[]> encryptedBlockHandler) {
-        chainItemProvider.restart();
-        byte[] encrypted;
-        for(byte[] plainBlock : plainTextBlockProvider) {
-            ChainItem chainItem = chainItemProvider.get();
-            assert chainItem != null : "ChainItemProvider returned null";
-            encrypted = new byte[]{0};//chainItem.encrypt(plainBlock);
-            encryptedBlockHandler.accept(encrypted);
+    @Override
+    public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) {
+        currentBlockCrypterNumber = 0;
+        for (ChainItem chainItem : chainItems) {
+            chainItem.onEachExecution(
+                    LambdaHelper.rethrowAsError(() ->
+                            chainItem.getBlockCrypter().encrypt(openDataIS, encryptedDataOS)
+                    )
+            );
         }
     }
 
-    public void decrypt(Iterable<byte[]> encryptedTextBlockProvider, Consumer<byte[]> decryptedBlockHandler) {
-        chainItemProvider.restart();
-        byte[] decrypted;
-        for(byte[] encryptedBlock : encryptedTextBlockProvider) {
-            ChainItem chainItem = chainItemProvider.get();
-            assert chainItem != null : "ChainItemProvider returned null";
-            decrypted = new byte[]{0};//chainItem.decrypt(encryptedBlock);
-            decryptedBlockHandler.accept(decrypted);
+    @Override
+    public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) {
+        currentBlockCrypterNumber = 0;
+        for (ChainItem chainItem : chainItems) {
+            chainItem.onEachExecution(
+                    LambdaHelper.rethrowAsError(() ->
+                            chainItem.getBlockCrypter().decrypt(encryptedDataIS, openDataOS)
+                    )
+            );
         }
+    }
+
+    @Override
+    public byte[] nextEncryptionVector() {
+        System.out.println("Chain is providing next encryption vector: " + (1 + currentBlockCrypterNumber));
+        return vectors.get(++currentBlockCrypterNumber);
+    }
+
+    @Override
+    public byte[] nextDecryptionVector() {
+        System.out.println("Chain is providing next decryption vector: " + (1 - currentBlockCrypterNumber));
+        return nextEncryptionVector();
+    }
+
+    @Override
+    public void setNextBlockVector(byte[] vector) {
+        System.out.println("New vector wants to be added to Chain: " + Arrays.toString(vector));
+        vectors.add(vector);
     }
 }

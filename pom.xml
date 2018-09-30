@@ -8,9 +8,10 @@
     <artifactId>chaincrypt</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>chaintypes</module>
+        <module>chaining</module>
         <module>cryptoalgo</module>
         <module>test</module>
+        <module>helpers</module>
     </modules>
     <packaging>pom</packaging>
 

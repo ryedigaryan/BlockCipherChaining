@@ -8,12 +8,4 @@ public abstract class CipherDecorator implements Cipher {
     public CipherDecorator(Cipher decorated) {
         cipher = decorated;
     }
-
-//    public byte[] encrypt(byte[] message) {
-//        return cipher.encrypt(message);
-//    }
-//
-//    public byte[] decrypt(byte[] encrypted) {
-//        return cipher.decrypt(encrypted);
-//    }
 }
