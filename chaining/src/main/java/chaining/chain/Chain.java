@@ -9,8 +9,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
-public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, Cipher {
+public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, Cipher, Iterable<ChainItem> {
     private int currentBlockCrypterNumber;
     private ArrayList<byte[]> vectors;
     private ChainItem[] chainItems;
@@ -44,7 +45,7 @@ public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, 
     @Override
     public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) {
 //        currentBlockCrypterNumber = 0;
-        for (ChainItem chainItem : chainItems) {
+        for (ChainItem chainItem : this) {
             chainItem.onEachExecution(
                     LambdaHelper.rethrowAsError(() ->
                             chainItem.getBlockCrypter().decrypt(encryptedDataIS, openDataOS)
@@ -74,5 +75,13 @@ public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, 
     @Override
     public void reset() {
         currentBlockCrypterNumber = 0;
+        for (ChainItem chainItem : chainItems) {
+            chainItem.getBlockCrypter().reset();
+        }
+    }
+
+    @Override
+    public Iterator<ChainItem> iterator() {
+        return Arrays.asList(chainItems).iterator();
     }
 }
