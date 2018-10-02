@@ -26,36 +26,45 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithmDecorator<K> im
 
     @Override
     public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-        int readBytes;
-        int blockSize = getCryptableBlockSize();
-        byte[] block = new byte[blockSize];
         setKey(keyProvider.nextKey());
-        if((readBytes = openDataIS.read(block)) == -1) {
-            throw new IllegalStateException("BlockCrypter.encrypt called when openDataInputStream has no more elements");
-        }
-        else if(readBytes == blockSize) {
-            super.encrypt(new ByteArrayInputStream(block), encryptedDataOS);
+        if(getCryptableBlockSize() != -1) {
+            byte[] block = new byte[getCryptableBlockSize()];
+            encrypt(openDataIS, encryptedDataOS, block);
         }
         else {
-            super.encrypt(new ByteArrayInputStream(block, 0, readBytes), encryptedDataOS);
+            super.encrypt(openDataIS, encryptedDataOS);
         }
     }
 
     @Override
     public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-        int readBytes;
-        int blockSize = getCryptableBlockSize();
-        byte[] block = new byte[blockSize];
         setKey(keyProvider.nextKey());
-        if((readBytes = encryptedDataIS.read(block)) == -1) {
-            throw new IllegalStateException("BlockCrypter.decrypt called when openDataInputStream has no more elements");
-        }
-        else if(readBytes == blockSize) {
-            super.decrypt(new ByteArrayInputStream(block), openDataOS);
+        if(getCryptableBlockSize() != -1) {
+            byte[] block = new byte[getCryptableBlockSize()];
+            decrypt(encryptedDataIS, openDataOS, block);
         }
         else {
-            super.decrypt(new ByteArrayInputStream(block, 0, readBytes), openDataOS);
+            super.decrypt(encryptedDataIS, openDataOS);
         }
+    }
+
+    private void encrypt(InputStream openDataIS, OutputStream encryptedDataOS, byte[] holder) throws IOException {
+        super.encrypt(refactor(openDataIS, holder), encryptedDataOS);
+    }
+
+    private void decrypt(InputStream encryptedDataIS, OutputStream openDataOS, byte[] holder) throws IOException {
+        super.decrypt(refactor(encryptedDataIS, holder), openDataOS);
+    }
+
+    private static InputStream refactor(InputStream stream, byte[] holder) throws IOException {
+        int readBytes;
+        if((readBytes = stream.read(holder)) == -1) {
+            throw new IllegalStateException("BlockCrypter.encrypt/decrypt called when input stream has no more elements");
+        }
+        if(readBytes == holder.length) {
+            return new ByteArrayInputStream(holder);
+        }
+        return new ByteArrayInputStream(holder, 0, readBytes);
     }
 
     @Override
