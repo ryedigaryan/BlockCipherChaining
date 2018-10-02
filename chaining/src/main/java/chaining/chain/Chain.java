@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, Cipher, Iterable<ChainItem> {
+public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorProvider, BlockCrypterDelegate {
     private int currentBlockCrypterNumber;
     private ArrayList<byte[]> vectors;
     private ChainItem[] chainItems;
