@@ -1,6 +1,5 @@
 package chaining.chain;
 
-import chaining.chain.item.ChainItem;
 import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterVectorProvider;
 import cryptoalgo.Cipher;
@@ -32,7 +31,7 @@ public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, 
 
     @Override
     public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) {
-        currentBlockCrypterNumber = 0;
+//        currentBlockCrypterNumber = 0;
         for (ChainItem chainItem : chainItems) {
             chainItem.onEachExecution(
                     LambdaHelper.rethrowAsError(() ->
@@ -44,7 +43,7 @@ public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, 
 
     @Override
     public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) {
-        currentBlockCrypterNumber = 0;
+//        currentBlockCrypterNumber = 0;
         for (ChainItem chainItem : chainItems) {
             chainItem.onEachExecution(
                     LambdaHelper.rethrowAsError(() ->
@@ -70,5 +69,10 @@ public class Chain implements BlockCrypterVectorProvider, BlockCrypterDelegate, 
     public void setNextBlockVector(byte[] vector) {
         System.out.println("New vector wants to be added to Chain: " + Arrays.toString(vector));
         vectors.add(vector);
+    }
+
+    @Override
+    public void reset() {
+        currentBlockCrypterNumber = 0;
     }
 }

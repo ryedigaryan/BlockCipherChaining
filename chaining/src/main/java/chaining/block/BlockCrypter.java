@@ -1,17 +1,16 @@
-package chaining;
+package chaining.block;
 
 import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterKeyProvider;
 import chaining.helper.BlockCrypterVectorProvider;
 import cryptoalgo.EncryptionAlgorithm;
 
-public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements BlockCrypterKeyProvider {
+public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
     protected EncryptionAlgorithm<K> algorithm;
 
-    private BlockCrypterKeyProvider<K> keyProvider;
-    private BlockCrypterVectorProvider vectorProvider;
-    //TODO: do not forget to call delegate.setNextBlockVector
-    private BlockCrypterDelegate delegate;
+    protected BlockCrypterKeyProvider<K> keyProvider;
+    protected BlockCrypterVectorProvider vectorProvider;
+    protected BlockCrypterDelegate delegate;
 
     private int cryptableBlockSize;
 

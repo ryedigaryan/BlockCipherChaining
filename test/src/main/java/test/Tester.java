@@ -4,12 +4,19 @@ import cryptoalgo.CaesarCipher;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.lang.reflect.Constructor;
 
 //TODO: THINK ABOUT CHAIN .... FUCK
 public class Tester {
     public static void main(String[] args) throws Throwable {
-        Tester t = new Tester();
-        t.caesarTest();
+        Tst t = Tst.create();
+        Constructor<Tst> c = Tst.class.getDeclaredConstructor();
+        c.setAccessible(true);
+        Tst t2 = c.newInstance();
+
+
+//        Tester t = new Tester();
+//        t.caesarTest();
     }
 
     void caesarTest() throws Throwable {
@@ -28,5 +35,15 @@ public class Tester {
         cc.encrypt(openIn, encryptOut);
         cc.decrypt(encryptIn, decryptOut);
 
+    }
+}
+
+class Tst {
+    private Tst() {
+        System.out.println("in a private constructor");
+    }
+
+    public static Tst create() {
+        return new Tst();
     }
 }
