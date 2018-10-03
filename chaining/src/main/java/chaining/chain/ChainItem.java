@@ -1,7 +1,6 @@
 package chaining.chain;
 
 import chaining.block.BlockCrypter;
-import chaining.helper.BlockCrypterKeyProvider;
 
 import java.util.function.Consumer;
 
@@ -12,11 +11,6 @@ public class ChainItem<K> {
     public ChainItem(BlockCrypter<K> blockCrypter, int executionCount) {
         this.blockCrypter = blockCrypter;
         this.executionCount = executionCount;
-    }
-
-    public ChainItem(BlockCrypter<K> blockCrypter, int executionCount, BlockCrypterKeyProvider<K> keyProvider) {
-        this(blockCrypter, executionCount);
-        blockCrypter.setKeyProvider(keyProvider);
     }
 
     public BlockCrypter<K> getBlockCrypter() {
