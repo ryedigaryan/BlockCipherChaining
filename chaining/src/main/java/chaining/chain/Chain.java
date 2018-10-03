@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorProvider, BlockCrypterDelegate {
-    private int currentBlockCrypterNumber;
+    private int currentVectorNumber;
     private ArrayList<byte[]> vectors;
     private ChainItem[] chainItems;
 
@@ -32,7 +32,8 @@ public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorPro
 
     @Override
     public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) {
-//        currentBlockCrypterNumber = 0;
+        System.out.println("Chain - encrypt");
+        reset();
         for (ChainItem chainItem : chainItems) {
             chainItem.onEachExecution(
                     LambdaHelper.rethrowAsError(() ->
@@ -40,11 +41,13 @@ public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorPro
                     )
             );
         }
+        System.out.println("Chain - encrypt - done");
     }
 
     @Override
     public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) {
-//        currentBlockCrypterNumber = 0;
+        System.out.println("Chain - decrypt");
+        reset();
         for (ChainItem chainItem : this) {
             chainItem.onEachExecution(
                     LambdaHelper.rethrowAsError(() ->
@@ -52,17 +55,18 @@ public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorPro
                     )
             );
         }
+        System.out.println("Chain - decrypt - done");
     }
 
     @Override
     public byte[] nextEncryptionVector() {
-        System.out.println("Chain is providing next encryption vector: " + (1 + currentBlockCrypterNumber));
-        return vectors.get(++currentBlockCrypterNumber);
+        System.out.println("Chain is providing next encryption vector: " + (1 + currentVectorNumber));
+        return vectors.get(++currentVectorNumber);
     }
 
     @Override
     public byte[] nextDecryptionVector() {
-        System.out.println("Chain is providing next decryption vector: " + (1 - currentBlockCrypterNumber));
+        System.out.println("Chain is providing next decryption vector: " + (1 - currentVectorNumber));
         return nextEncryptionVector();
     }
 
@@ -74,7 +78,8 @@ public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorPro
 
     @Override
     public void reset() {
-        currentBlockCrypterNumber = 0;
+        System.out.println("Resetting Chain");
+        currentVectorNumber = 0;
         for (ChainItem chainItem : chainItems) {
             chainItem.getBlockCrypter().reset();
         }

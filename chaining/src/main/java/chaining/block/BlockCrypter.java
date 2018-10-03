@@ -69,6 +69,7 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithmDecorator<K> im
 
     @Override
     public void reset() {
+        System.out.println("Resetting BlockCrypter");
         keyProvider.reset();
     }
 

@@ -9,10 +9,14 @@ public class ChainItem<K> {
     private BlockCrypter<K> blockCrypter;
     private int executionCount;
 
-    public ChainItem(BlockCrypter<K> blockCrypter, int executionCount, BlockCrypterKeyProvider<K> keyProvider) {
-        blockCrypter.setKeyProvider(keyProvider);
+    public ChainItem(BlockCrypter<K> blockCrypter, int executionCount) {
         this.blockCrypter = blockCrypter;
         this.executionCount = executionCount;
+    }
+
+    public ChainItem(BlockCrypter<K> blockCrypter, int executionCount, BlockCrypterKeyProvider<K> keyProvider) {
+        this(blockCrypter, executionCount);
+        blockCrypter.setKeyProvider(keyProvider);
     }
 
     public BlockCrypter<K> getBlockCrypter() {
