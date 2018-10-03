@@ -1,5 +1,5 @@
 package chaining.helper;
 
-public interface Resetable {
+public interface Resettable {
     void reset();
 }

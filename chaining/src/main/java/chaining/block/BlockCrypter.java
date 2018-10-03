@@ -4,7 +4,7 @@ import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterKeyProvider;
 import chaining.helper.BlockCrypterVectorProvider;
 import chaining.helper.EncryptionAlgorithmDecorator;
-import chaining.helper.Resetable;
+import chaining.helper.Resettable;
 import cryptoalgo.EncryptionAlgorithm;
 
 import java.io.ByteArrayInputStream;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public abstract class BlockCrypter<K> extends EncryptionAlgorithmDecorator<K> implements Resetable {
+public abstract class BlockCrypter<K> extends EncryptionAlgorithmDecorator<K> implements Resettable {
     protected BlockCrypterKeyProvider<K> keyProvider;
     protected BlockCrypterVectorProvider vectorProvider;
     protected BlockCrypterDelegate delegate;
