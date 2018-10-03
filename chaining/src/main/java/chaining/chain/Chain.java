@@ -7,13 +7,13 @@ import cryptoalgo.Cipher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 public abstract class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterDelegate, BlockCrypterVectorProvider {
-    List<byte[]> vectors;
-    List<ChainItem> chainItems;
+    // these fields are protected because derived classes must have access to theme
+    protected List<byte[]> vectors;
+    protected List<ChainItem> chainItems;
 
     public Chain(byte[] initialVector, ChainItem... chainItems) {
         this.chainItems = Arrays.asList(chainItems);
@@ -32,13 +32,5 @@ public abstract class Chain implements Iterable<ChainItem>, Cipher, BlockCrypter
     @Override
     public Iterator<ChainItem> iterator() {
         return new ImmutableCollection.NonRemovableIterator<>(chainItems.iterator());
-    }
-
-    public Collection<byte[]> getVectors() {
-        return new ImmutableCollection<>(vectors);
-    }
-
-    public Collection<ChainItem> getChainItems() {
-        return new ImmutableCollection<>(chainItems);
     }
 }
