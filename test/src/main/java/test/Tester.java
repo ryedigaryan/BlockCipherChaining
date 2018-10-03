@@ -1,8 +1,8 @@
 package test;
 
 import chaining.block.ECB;
-import chaining.chain.Chain;
 import chaining.chain.ChainItem;
+import chaining.chain.SimpleChain;
 import chaining.helper.BlockCrypterKeyProvider;
 import cryptoalgo.CaesarCipher;
 
@@ -74,9 +74,10 @@ public class Tester {
         ChainItem<Byte> ecbCI = new ChainItem<>(ecb, 70);
         ChainItem<Byte> ecbCI2 = new ChainItem<>(ecb, 6);
 
-        Chain ecbChain = new Chain(null, ecbCI, ecbCI2);
-        ecbChain.encrypt(openIn, encryptOut);
-        ecbChain.decrypt(encryptIn, decryptOut);
+        SimpleChain ecbSimpleChain = new SimpleChain(null, ecbCI, ecbCI2);
+        ecbSimpleChain.encrypt(openIn, encryptOut);
+        ecbSimpleChain.decrypt(encryptIn, decryptOut);
+
     }
 }
 
