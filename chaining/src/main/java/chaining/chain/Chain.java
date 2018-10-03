@@ -2,22 +2,21 @@ package chaining.chain;
 
 import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterVectorProvider;
+import chaining.helper.ImmutableCollection;
 import cryptoalgo.Cipher;
-import helpers.handlers.LambdaHelper;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
-public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorProvider, BlockCrypterDelegate {
-    private int currentVectorNumber;
-    private ArrayList<byte[]> vectors;
-    private ChainItem[] chainItems;
+public abstract class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterDelegate, BlockCrypterVectorProvider {
+    List<byte[]> vectors;
+    List<ChainItem> chainItems;
 
     public Chain(byte[] initialVector, ChainItem... chainItems) {
-        this.chainItems = chainItems;
+        this.chainItems = Arrays.asList(chainItems);
         // 1st(at 0 index) is the initialVector
         int blocksCount = 1 + Arrays.stream(chainItems)
                 .mapToInt(chainItem -> {
@@ -27,66 +26,19 @@ public class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterVectorPro
                 })
                 .sum();
         vectors = new ArrayList<>(blocksCount);
-        vectors.add(initialVector);
-    }
-
-    @Override
-    public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) {
-        System.out.println("Chain - encrypt");
-        reset();
-        for (ChainItem chainItem : chainItems) {
-            chainItem.onEachExecution(
-                    LambdaHelper.rethrowAsError(() ->
-                            chainItem.getBlockCrypter().encrypt(openDataIS, encryptedDataOS)
-                    )
-            );
-        }
-        System.out.println("Chain - encrypt - done");
-    }
-
-    @Override
-    public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) {
-        System.out.println("Chain - decrypt");
-        reset();
-        for (ChainItem chainItem : this) {
-            chainItem.onEachExecution(
-                    LambdaHelper.rethrowAsError(() ->
-                            chainItem.getBlockCrypter().decrypt(encryptedDataIS, openDataOS)
-                    )
-            );
-        }
-        System.out.println("Chain - decrypt - done");
-    }
-
-    @Override
-    public byte[] nextEncryptionVector() {
-        System.out.println("Chain is providing next encryption vector: " + (1 + currentVectorNumber));
-        return vectors.get(++currentVectorNumber);
-    }
-
-    @Override
-    public byte[] nextDecryptionVector() {
-        System.out.println("Chain is providing next decryption vector: " + (1 - currentVectorNumber));
-        return nextEncryptionVector();
-    }
-
-    @Override
-    public void setNextBlockVector(byte[] vector) {
-        System.out.println("New vector wants to be added to Chain: " + Arrays.toString(vector));
-        vectors.add(vector);
-    }
-
-    @Override
-    public void reset() {
-        System.out.println("Resetting Chain");
-        currentVectorNumber = 0;
-        for (ChainItem chainItem : chainItems) {
-            chainItem.getBlockCrypter().reset();
-        }
+        setNextBlockVector(initialVector);
     }
 
     @Override
     public Iterator<ChainItem> iterator() {
-        return Arrays.asList(chainItems).iterator();
+        return new ImmutableCollection.NonRemovableIterator<>(chainItems.iterator());
+    }
+
+    public Collection<byte[]> getVectors() {
+        return new ImmutableCollection<>(vectors);
+    }
+
+    public Collection<ChainItem> getChainItems() {
+        return new ImmutableCollection<>(chainItems);
     }
 }
