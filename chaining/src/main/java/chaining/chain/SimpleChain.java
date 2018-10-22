@@ -8,12 +8,15 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 public class SimpleChain extends Chain {
-    private Iterator<byte[]> vectorIterator;
+private Iterator<byte[]> vectorIterator;
 
     public SimpleChain(byte[] initialVector, ChainItem... chainItems) {
         super(initialVector, chainItems);
     }
 
+    //
+    // Cipher's overrides
+    //
     @Override
     public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) {
         System.out.println("SimpleChain - encrypt");
@@ -42,6 +45,10 @@ public class SimpleChain extends Chain {
         System.out.println("SimpleChain - decrypt - done");
     }
 
+    //
+    // BlockCrypterVectorProvider's overrides
+    //
+
     @Override
     public byte[] nextEncryptionVector() {
         System.out.println("SimpleChain is providing next encryption vector");
@@ -54,11 +61,19 @@ public class SimpleChain extends Chain {
         return nextEncryptionVector();
     }
 
+    //
+    // BlockCrypterDelegate's overrides
+    //
+
     @Override
     public void setNextBlockVector(byte[] vector) {
         System.out.println("New vector wants to be added to SimpleChain: " + Arrays.toString(vector));
         vectors.add(vector);
     }
+
+    //
+    // Resettable's overrides
+    //
 
     @Override
     public void reset() {

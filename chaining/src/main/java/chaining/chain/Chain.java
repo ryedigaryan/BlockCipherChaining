@@ -2,7 +2,7 @@ package chaining.chain;
 
 import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterVectorProvider;
-import chaining.helper.ImmutableCollection;
+import chaining.helper.ImmutableCollection.NonRemovableIterator;
 import cryptoalgo.Cipher;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public abstract class Chain implements Iterable<ChainItem>, Cipher, BlockCrypterDelegate, BlockCrypterVectorProvider {
-    // these fields are protected because derived classes must have access to theme
+    // these fields are protected because derived classes must have access to them
     protected List<byte[]> vectors;
     protected List<ChainItem> chainItems;
 
@@ -31,6 +31,6 @@ public abstract class Chain implements Iterable<ChainItem>, Cipher, BlockCrypter
 
     @Override
     public Iterator<ChainItem> iterator() {
-        return new ImmutableCollection.NonRemovableIterator<>(chainItems.iterator());
+        return new NonRemovableIterator<>(chainItems.iterator());
     }
 }

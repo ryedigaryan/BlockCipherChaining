@@ -22,6 +22,7 @@ public class ImmutableCollection<E> implements Collection<E> {
             return iterator.next();
         }
     }
+
     private Collection<E> collection;
 
     public ImmutableCollection(Collection<E> collection) {
