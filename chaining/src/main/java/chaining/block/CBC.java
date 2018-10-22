@@ -2,10 +2,6 @@ package chaining.block;
 
 import cryptoalgo.EncryptionAlgorithm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 public class CBC<K> extends BlockCrypter<K> {
 
     public CBC(EncryptionAlgorithm<K> rootAlgorithm, int cryptableBlockSize) {
@@ -13,12 +9,12 @@ public class CBC<K> extends BlockCrypter<K> {
     }
 
     @Override
-    public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-
+    protected byte[] modifyInput(byte[] openData, byte[] vector, int inputLength) {
+        return new byte[0];
     }
 
     @Override
-    public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-
+    protected byte[] modifyOutput(byte[] encryptedData, byte[] vector, int inputLength) {
+        return new byte[0];
     }
 }

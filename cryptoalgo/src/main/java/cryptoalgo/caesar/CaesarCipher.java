@@ -11,25 +11,25 @@ public class CaesarCipher extends EncryptionAlgorithm<Byte> {
     // EncryptionAlgorithm
     //
     @Override
-    protected void applyEncryptionAlgorithm(Byte key, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
+    protected void applyEncryptionAlgorithm(Byte eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
         int openByte;
         while((openByte = openDataIS.read()) != -1) {
-            byte encryptedByte = Utils.shift((byte)openByte, key);
+            byte encryptedByte = Utils.shift((byte)openByte, eKey);
             encryptedDataOS.write(encryptedByte);
         }
     }
 
     @Override
-    protected void applyDecryptionAlgorithm(Byte key, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-        applyEncryptionAlgorithm(key, encryptedDataIS, openDataOS);
+    protected void applyDecryptionAlgorithm(Byte dKey, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
+        applyEncryptionAlgorithm(dKey, encryptedDataIS, openDataOS);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Byte decryptionKey(Byte encryptionKey) {
-        return (byte)(Constants.SYMBOL_MAX - encryptionKey);
+    public Byte decryptionKey(Byte eKey) {
+        return (byte)(Constants.SYMBOL_MAX - eKey);
     }
 
     @Override

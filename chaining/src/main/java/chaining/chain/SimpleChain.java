@@ -2,6 +2,7 @@ package chaining.chain;
 
 import helpers.handlers.LambdaHelper;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -18,31 +19,35 @@ private Iterator<byte[]> vectorIterator;
     // Cipher's overrides
     //
     @Override
-    public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) {
+    public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
         System.out.println("SimpleChain - encrypt");
         reset();
         for (ChainItem chainItem : this) {
             chainItem.onEachExecution(
                     LambdaHelper.rethrowAsError(() ->
-                            chainItem.getBlockCrypter().encrypt(openDataIS, encryptedDataOS)
+                            chainItem.getBlockCrypter().encrypt(chainItem.getBlockCrypter().keyProvider.nextKey(), openDataIS, encryptedDataOS)
                     )
             );
         }
         System.out.println("SimpleChain - encrypt - done");
+        openDataIS.close();
+        encryptedDataOS.close();
     }
 
     @Override
-    public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) {
+    public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
         System.out.println("SimpleChain - decrypt");
         reset();
         for (ChainItem chainItem : this) {
             chainItem.onEachExecution(
                     LambdaHelper.rethrowAsError(() ->
-                            chainItem.getBlockCrypter().decrypt(encryptedDataIS, openDataOS)
+                            chainItem.getBlockCrypter().decrypt(chainItem.getBlockCrypter().keyProvider.nextKey(), encryptedDataIS, openDataOS)
                     )
             );
         }
         System.out.println("SimpleChain - decrypt - done");
+        encryptedDataIS.close();
+        openDataOS.close();
     }
 
     //
@@ -52,7 +57,7 @@ private Iterator<byte[]> vectorIterator;
     @Override
     public byte[] nextEncryptionVector() {
         System.out.println("SimpleChain is providing next encryption vector");
-        return vectorIterator.next();
+        return vectorIterator.hasNext() ? vectorIterator.next() : null;
     }
 
     @Override

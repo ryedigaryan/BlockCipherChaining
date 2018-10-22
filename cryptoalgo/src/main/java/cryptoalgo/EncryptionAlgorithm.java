@@ -3,6 +3,7 @@ package cryptoalgo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 /**
  * Symmetric Encryption Algorithm base class.<br>
@@ -30,7 +31,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * Setup encryption & decryption keys.
      * @param key encryption key
      */
-    public void setKey(K key) {
+    public void setKey(Object key) {
         this.eKey = normalizeKey(key);
         this.dKey = decryptionKey(this.eKey);
     }
@@ -47,34 +48,41 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
     // Cipher
     //
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     final public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
+        Objects.requireNonNull(eKey, "encryption key is null");
         applyEncryptionAlgorithm(eKey, openDataIS, encryptedDataOS);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     final public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-        applyDecryptionAlgorithm(eKey, encryptedDataIS, openDataOS);
+        Objects.requireNonNull(dKey, "decryption key is null");
+        applyDecryptionAlgorithm(dKey, encryptedDataIS, openDataOS);
     }
 
     /**
      * Alternative encryption function which can be used for passing custom key on each execution
-     *
-     * @param key normalized key for encryption
+     * @param eKey normalized key for encryption
      */
-    final public void encrypt(K key, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-        normalizeKey(key);
-        applyEncryptionAlgorithm(key, openDataIS, encryptedDataOS);
+    final public void encrypt(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
+        eKey = normalizeKey(eKey);
+        applyEncryptionAlgorithm(eKey, openDataIS, encryptedDataOS);
     }
 
     /**
      * Alternative decryption function which can be used for passing custom key on each execution
-     *
-     * @param key normalized key for decryption
+     * @param eKey normalized key for decryption
      */
-    final public void decrypt(K key, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-        normalizeKey(key);
-        applyDecryptionAlgorithm(key, encryptedDataIS, openDataOS);
+    final public void decrypt(K eKey, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
+        eKey = normalizeKey(eKey);
+        K dKey = decryptionKey(eKey);
+        applyDecryptionAlgorithm(dKey, encryptedDataIS, openDataOS);
     }
 
     /**
@@ -83,18 +91,34 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * @return normalized key
      * @throws IllegalArgumentException if {@code key} contains something wrong
      */
-    abstract protected K normalizeKey(Object key) throws IllegalArgumentException;
+    abstract public K normalizeKey(Object key) throws IllegalArgumentException;
 
     /**
      * Constructs decryption key from normalized encryption key
-     * @param encryptionKey encryption key from which decryption key must be constructed
+     * @param eKey encryption key from which decryption key must be constructed
      * @return decryption key for corresponding {@code encryptionKey}
      */
-    abstract protected K decryptionKey(K encryptionKey);
+    abstract public K decryptionKey(K eKey);
 
-    abstract protected void applyEncryptionAlgorithm(K key, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException;
+    /**
+     * The function which actually does encryption. Here can be assumed that passed key meets all the requirements of
+     * current algorithm.
+     * @param eKey normalized encryption key
+     * @param openDataIS open data input stream, which must be encrypted
+     * @param encryptedDataOS encrypted data output stream, where encrypted data must be written to
+     * @throws IOException read/write exception
+     */
+    abstract protected void applyEncryptionAlgorithm(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException;
 
-    abstract protected void applyDecryptionAlgorithm(K key, InputStream encryptedDataIS, OutputStream openDataOS) throws  IOException;
+    /**
+     * The function which actually does decryption. Here can be assumed that passed key meets all the requirements of
+     * current algorithm.
+     * @param dKey normalized decryption key
+     * @param encryptedDataIS encrypted data input stream, which must be decrypted
+     * @param openDataOS decrypted data output stream, where decrypted data must be written to
+     * @throws IOException read/write exception
+     */
+    abstract protected void applyDecryptionAlgorithm(K dKey, InputStream encryptedDataIS, OutputStream openDataOS) throws  IOException;
 
     //
     // Object
@@ -102,7 +126,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
 
     @Override
     public int hashCode() {
-        return eKey.hashCode();
+        return Objects.hashCode(eKey);
     }
 
     @Override
@@ -112,9 +136,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
         }
         if(obj instanceof EncryptionAlgorithm) {
             EncryptionAlgorithm other = (EncryptionAlgorithm)obj;
-            if(eKey == other.eKey)
-                return true;
-            return eKey.equals(other.eKey);
+            return Objects.equals(eKey, other.eKey);
         }
         return false;
     }

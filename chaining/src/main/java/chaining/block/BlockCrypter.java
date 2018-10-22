@@ -3,78 +3,34 @@ package chaining.block;
 import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterKeyProvider;
 import chaining.helper.BlockCrypterVectorProvider;
-import chaining.helper.EncryptionAlgorithmDecorator;
 import chaining.helper.Resettable;
 import cryptoalgo.EncryptionAlgorithm;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
-public abstract class BlockCrypter<K> extends EncryptionAlgorithmDecorator<K> implements Resettable {
-    protected BlockCrypterKeyProvider<K> keyProvider;
-    protected BlockCrypterVectorProvider vectorProvider;
+abstract public class BlockCrypter<K> extends EncryptionAlgorithm<K> implements Resettable {
+    private EncryptionAlgorithm<K> algorithm;
+    private int cryptableBlockSize;
+    public BlockCrypterKeyProvider<K> keyProvider;
+    private BlockCrypterVectorProvider vectorProvider;
     protected BlockCrypterDelegate delegate;
 
-    private int cryptableBlockSize;
-
-    public BlockCrypter(EncryptionAlgorithm<K> rootAlgorithm, int cryptableBlockSize) {
-        super(rootAlgorithm);
+    public BlockCrypter(EncryptionAlgorithm<K> algorithm, int cryptableBlockSize) {
+        this.algorithm = algorithm;
         this.cryptableBlockSize = cryptableBlockSize;
     }
 
-    @Override
-    public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-        setKey(keyProvider.nextKey());
-        if(getCryptableBlockSize() != -1) {
-            byte[] block = new byte[getCryptableBlockSize()];
-            encrypt(openDataIS, encryptedDataOS, block);
-        }
-        else {
-            super.encrypt(openDataIS, encryptedDataOS);
-        }
-    }
+    //
+    // setters
+    //
 
-    @Override
-    public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-        setKey(keyProvider.nextKey());
-        if(getCryptableBlockSize() != -1) {
-            byte[] block = new byte[getCryptableBlockSize()];
-            decrypt(encryptedDataIS, openDataOS, block);
-        }
-        else {
-            super.decrypt(encryptedDataIS, openDataOS);
-        }
-    }
-
-    private void encrypt(InputStream openDataIS, OutputStream encryptedDataOS, byte[] holder) throws IOException {
-        super.encrypt(refactor(openDataIS, holder), encryptedDataOS);
-    }
-
-    private void decrypt(InputStream encryptedDataIS, OutputStream openDataOS, byte[] holder) throws IOException {
-        super.decrypt(refactor(encryptedDataIS, holder), openDataOS);
-    }
-
-    private static InputStream refactor(InputStream stream, byte[] holder) throws IOException {
-        int readBytes;
-        if((readBytes = stream.read(holder)) == -1) {
-            throw new IllegalStateException("BlockCrypter.encrypt/decrypt called when input stream has no more elements");
-        }
-        if(readBytes == holder.length) {
-            return new ByteArrayInputStream(holder);
-        }
-        return new ByteArrayInputStream(holder, 0, readBytes);
-    }
-
-    @Override
-    public void reset() {
-        System.out.println("Resetting BlockCrypter");
-        keyProvider.reset();
-    }
-
-    public int getCryptableBlockSize() {
-        return cryptableBlockSize;
+    public void setAlgorithm(EncryptionAlgorithm<K> algorithm) {
+        this.algorithm = algorithm;
     }
 
     public void setKeyProvider(BlockCrypterKeyProvider<K> keyProvider) {
@@ -92,4 +48,78 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithmDecorator<K> im
     public void setCryptableBlockSize(int cryptableBlockSize) {
         this.cryptableBlockSize = cryptableBlockSize;
     }
+
+    //
+    // getters
+    //
+
+    public EncryptionAlgorithm<K> getAlgorithm() {
+        return algorithm;
+    }
+
+    public int getCryptableBlockSize() {
+        return cryptableBlockSize;
+    }
+
+    //
+    // EncryptionAlgorithm
+    //
+
+    @Override
+    final public K normalizeKey(Object key) throws IllegalArgumentException {
+        return algorithm.normalizeKey(key);
+    }
+
+    @Override
+    final public K decryptionKey(K eKey) {
+        return algorithm.decryptionKey(eKey);
+    }
+
+    @Override
+    protected void applyEncryptionAlgorithm(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
+        byte[] vector = vectorProvider.nextEncryptionVector();
+        int size = getCryptableBlockSize();
+        // prepare input stream
+        byte[] inputBlock = new byte[size];
+        int length = openDataIS.read(inputBlock);
+        inputBlock = modifyInput(inputBlock, vector, length);
+        // create OutputStream which will hold all encrypted data
+        ByteArrayOutputStream outputBlockOS = new ByteArrayOutputStream(size);
+        algorithm.encrypt(eKey, new ByteArrayInputStream(inputBlock), outputBlockOS);
+        // write encrypted data into desired output
+        byte[] outputBlock = modifyOutput(outputBlockOS.toByteArray(), vector, length);
+        encryptedDataOS.write(Arrays.copyOf(outputBlock, length));
+        outputBlockOS.close();
+    }
+
+    @Override
+    protected void applyDecryptionAlgorithm(K dKey, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
+        byte[] vector = vectorProvider.nextDecryptionVector();
+        int size = getCryptableBlockSize();
+        // prepare input stream
+        byte[] inputBlock = new byte[size];
+        int length = encryptedDataIS.read(inputBlock);
+        inputBlock = modifyOutput(inputBlock, vector, length);
+        // create OutputStream which will hold all encrypted data
+        ByteArrayOutputStream outputBlockOS = new ByteArrayOutputStream(size);
+        algorithm.decrypt(dKey, new ByteArrayInputStream(inputBlock, 0, length), outputBlockOS);
+        // write encrypted data into desired output
+        byte[] outputBlock = modifyInput(outputBlockOS.toByteArray(), vector, length);
+        openDataOS.write(Arrays.copyOf(outputBlock, length));
+        outputBlockOS.close();
+    }
+
+    @Override
+    public void reset() {
+        System.out.println("Resetting BlockCrypter");
+        keyProvider.reset();
+//        vectorProvider.reset();
+    }
+
+    //
+    //
+    //
+
+    abstract protected byte[] modifyInput(byte[] openData, byte[] vector, int inputLength);
+    abstract protected byte[] modifyOutput(byte[] encryptedData, byte[] vector, int inputLength);
 }
