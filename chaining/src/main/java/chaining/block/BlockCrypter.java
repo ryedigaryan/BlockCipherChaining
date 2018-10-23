@@ -1,10 +1,11 @@
 package chaining.block;
 
 import chaining.helper.BlockCrypterDelegate;
-import chaining.helper.BlockCrypterKeyProvider;
 import chaining.helper.BlockCrypterVectorProvider;
 import chaining.helper.Resettable;
 import cryptoalgo.EncryptionAlgorithm;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,52 +14,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+@Getter @Setter
 public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements Resettable {
     private EncryptionAlgorithm<K> algorithm;
     private int cryptableBlockSize;
-    public BlockCrypterKeyProvider<K> keyProvider;
     private BlockCrypterVectorProvider vectorProvider;
     protected BlockCrypterDelegate delegate;
 
     public BlockCrypter(EncryptionAlgorithm<K> algorithm, int cryptableBlockSize) {
         this.algorithm = algorithm;
         this.cryptableBlockSize = cryptableBlockSize;
-    }
-
-    //
-    // setters
-    //
-
-    public void setAlgorithm(EncryptionAlgorithm<K> algorithm) {
-        this.algorithm = algorithm;
-    }
-
-    public void setKeyProvider(BlockCrypterKeyProvider<K> keyProvider) {
-        this.keyProvider = keyProvider;
-    }
-
-    public void setVectorProvider(BlockCrypterVectorProvider vectorProvider) {
-        this.vectorProvider = vectorProvider;
-    }
-
-    public void setDelegate(BlockCrypterDelegate delegate) {
-        this.delegate = delegate;
-    }
-
-    public void setCryptableBlockSize(int cryptableBlockSize) {
-        this.cryptableBlockSize = cryptableBlockSize;
-    }
-
-    //
-    // getters
-    //
-
-    public EncryptionAlgorithm<K> getAlgorithm() {
-        return algorithm;
-    }
-
-    public int getCryptableBlockSize() {
-        return cryptableBlockSize;
     }
 
     //
@@ -129,8 +94,7 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements 
 
     @Override
     public void reset() {
-        System.out.println("Resetting BlockCrypter");
-        keyProvider.reset();
+        System.out.println("Resetting " + getClass());
 //        vectorProvider.reset();
     }
 

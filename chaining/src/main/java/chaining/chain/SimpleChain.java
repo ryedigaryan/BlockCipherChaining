@@ -24,8 +24,8 @@ private Iterator<byte[]> vectorIterator;
         reset();
         for (ChainItem chainItem : this) {
             chainItem.onEachExecution(
-                    LambdaHelper.rethrowAsError(() ->
-                            chainItem.getBlockCrypter().encrypt(chainItem.getBlockCrypter().keyProvider.nextKey(), openDataIS, encryptedDataOS)
+                    LambdaHelper.rethrowAsError((key) ->
+                            chainItem.getBlockCrypter().encrypt(key, openDataIS, encryptedDataOS)
                     )
             );
         }
@@ -40,8 +40,8 @@ private Iterator<byte[]> vectorIterator;
         reset();
         for (ChainItem chainItem : this) {
             chainItem.onEachExecution(
-                    LambdaHelper.rethrowAsError(() ->
-                            chainItem.getBlockCrypter().decrypt(chainItem.getBlockCrypter().keyProvider.nextKey(), encryptedDataIS, openDataOS)
+                    LambdaHelper.rethrowAsError((key) ->
+                            chainItem.getBlockCrypter().decrypt(key, encryptedDataIS, openDataOS)
                     )
             );
         }

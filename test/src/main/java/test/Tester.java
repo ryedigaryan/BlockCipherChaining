@@ -68,13 +68,14 @@ public class Tester {
                 System.out.println("Resetting KeyProvider");
             }
         };
-        ecb.setKeyProvider(keyProvider);
 
 //        ecb.encrypt(openIn, encryptOut);
 //        ecb.decrypt(encryptIn, decryptOut);
 
         ChainItem<Byte> ecbCI = new ChainItem<>(ecb, 70);
+        ecbCI.setKeyProvider(keyProvider);
         ChainItem<Byte> ecbCI2 = new ChainItem<>(ecb, 6);
+        ecbCI2.setKeyProvider(keyProvider);
 
         SimpleChain ecbSimpleChain = new SimpleChain(null, ecbCI, ecbCI2);
         ecbSimpleChain.encrypt(openIn, encryptOut);
