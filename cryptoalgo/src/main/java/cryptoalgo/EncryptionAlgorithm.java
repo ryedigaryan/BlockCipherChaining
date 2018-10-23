@@ -52,7 +52,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * {@inheritDoc}
      */
     @Override
-    final public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
+    public final void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
         Objects.requireNonNull(eKey, "encryption key is null");
         applyEncryptionAlgorithm(eKey, openDataIS, encryptedDataOS);
     }
@@ -61,7 +61,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * {@inheritDoc}
      */
     @Override
-    final public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
+    public final void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
         Objects.requireNonNull(dKey, "decryption key is null");
         applyDecryptionAlgorithm(dKey, encryptedDataIS, openDataOS);
     }
@@ -70,7 +70,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * Alternative encryption function which can be used for passing custom key on each execution
      * @param eKey normalized key for encryption
      */
-    final public void encrypt(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
+    public final void encrypt(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
         eKey = normalizeKey(eKey);
         applyEncryptionAlgorithm(eKey, openDataIS, encryptedDataOS);
     }
@@ -79,7 +79,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * Alternative decryption function which can be used for passing custom key on each execution
      * @param eKey normalized key for decryption
      */
-    final public void decrypt(K eKey, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
+    public final void decrypt(K eKey, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
         eKey = normalizeKey(eKey);
         K dKey = decryptionKey(eKey);
         applyDecryptionAlgorithm(dKey, encryptedDataIS, openDataOS);
@@ -91,14 +91,14 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * @return normalized key
      * @throws IllegalArgumentException if {@code key} contains something wrong
      */
-    abstract public K normalizeKey(Object key) throws IllegalArgumentException;
+    protected abstract K normalizeKey(Object key) throws IllegalArgumentException;
 
     /**
      * Constructs decryption key from normalized encryption key
      * @param eKey encryption key from which decryption key must be constructed
      * @return decryption key for corresponding {@code encryptionKey}
      */
-    abstract public K decryptionKey(K eKey);
+    protected abstract K decryptionKey(K eKey);
 
     /**
      * The function which actually does encryption. Here can be assumed that passed key meets all the requirements of
@@ -108,7 +108,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * @param encryptedDataOS encrypted data output stream, where encrypted data must be written to
      * @throws IOException read/write exception
      */
-    abstract protected void applyEncryptionAlgorithm(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException;
+    protected abstract void applyEncryptionAlgorithm(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException;
 
     /**
      * The function which actually does decryption. Here can be assumed that passed key meets all the requirements of
@@ -118,7 +118,7 @@ public abstract class EncryptionAlgorithm<K> implements Cipher {
      * @param openDataOS decrypted data output stream, where decrypted data must be written to
      * @throws IOException read/write exception
      */
-    abstract protected void applyDecryptionAlgorithm(K dKey, InputStream encryptedDataIS, OutputStream openDataOS) throws  IOException;
+    protected abstract void applyDecryptionAlgorithm(K dKey, InputStream encryptedDataIS, OutputStream openDataOS) throws  IOException;
 
     //
     // Object
