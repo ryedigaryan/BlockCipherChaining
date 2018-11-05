@@ -14,11 +14,12 @@ public abstract class Chain implements Iterable<ChainItem>, Cipher, BlockCrypter
     // these fields are protected because derived classes must have access to them
     protected List<byte[]> vectors;
     protected List<ChainItem> chainItems;
+    protected int blocksCount;
 
     public Chain(byte[] initialVector, ChainItem... chainItems) {
         this.chainItems = Arrays.asList(chainItems);
         // 1st(at 0 index) is the initialVector
-        int blocksCount = 1 + Arrays.stream(chainItems)
+        blocksCount = 1 + Arrays.stream(chainItems)
                 .mapToInt(chainItem -> {
                     chainItem.getBlockCrypter().setVectorProvider(this);
                     chainItem.getBlockCrypter().setDelegate(this);

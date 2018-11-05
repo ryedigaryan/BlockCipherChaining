@@ -57,10 +57,11 @@ public class Tester {
 
 
         CaesarCipher cc = new CaesarCipher();
-        cc.setKey(-22L);
+//        cc.setKey(-22L);
         ECB<Byte> ecb = new ECB<>(cc, 1);
         BlockCrypterKeyProvider<Byte> keyProvider = new BlockCrypterKeyProvider<Byte>() {
             public Byte nextKey() {
+                System.out.println(getClass() + " provides next key");
                 return -22;
             }
 
@@ -72,14 +73,19 @@ public class Tester {
 //        ecb.encrypt(openIn, encryptOut);
 //        ecb.decrypt(encryptIn, decryptOut);
 
-        ChainItem<Byte> ecbCI = new ChainItem<>(ecb, 70);
+        ChainItem<Byte> ecbCI = new ChainItem<>(ecb, 10);
         ecbCI.setKeyProvider(keyProvider);
-        ChainItem<Byte> ecbCI2 = new ChainItem<>(ecb, 6);
+        ChainItem<Byte> ecbCI2 = new ChainItem<>(ecb, 5);
         ecbCI2.setKeyProvider(keyProvider);
 
         SimpleChain ecbSimpleChain = new SimpleChain(null, ecbCI, ecbCI2);
         ecbSimpleChain.encrypt(openIn, encryptOut);
         ecbSimpleChain.decrypt(encryptIn, decryptOut);
+
+        openIn.close();
+        encryptOut.close();
+        encryptIn.close();
+        decryptOut.close();
 
     }
 }

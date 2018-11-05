@@ -1,5 +1,6 @@
 package chaining.block;
 
+import chaining.helper.Utils;
 import cryptoalgo.EncryptionAlgorithm;
 
 public class CBC<K> extends BlockCrypter<K> {
@@ -10,11 +11,12 @@ public class CBC<K> extends BlockCrypter<K> {
 
     @Override
     protected byte[] modifyInput(byte[] openData, byte[] vector, int inputLength) {
-        return new byte[0];
+        return Utils.xor(openData, vector);
     }
 
     @Override
     protected byte[] modifyOutput(byte[] encryptedData, byte[] vector, int inputLength) {
-        return new byte[0];
+        delegate.setNextBlockVector(encryptedData);
+        return encryptedData;
     }
 }

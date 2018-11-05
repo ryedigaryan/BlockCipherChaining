@@ -58,6 +58,7 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements 
         return eKey;
     }
 
+    //TODO: pass here the block and return block instead of streams in encrypt(...) methods write response into ostream
     @Override
     protected void applyEncryptionAlgorithm(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
         byte[] vector = vectorProvider.nextEncryptionVector();
