@@ -1,25 +1,41 @@
 package chaining.block;
 
+import chaining.helper.Modifier;
 import chaining.helper.Utils;
 import cryptoalgo.EncryptionAlgorithm;
 
 public class OFB<K> extends BlockCrypter<K> {
 
-    private byte[] previousOpenData;
+    private class EncryptionModifier implements Modifier {
+
+        private byte[] plainText;
+
+        @Override
+        public byte[] firstModification(byte[] data, byte[] vector, int inputLength) {
+            plainText = data;
+            return vector;
+        }
+
+        @Override
+        public byte[] secondModification(byte[] data, byte[] vector, int inputLength) {
+            delegate.setNextBlockVector(data);
+            return Utils.xor(data, plainText);
+        }
+    }
+
+    private final EncryptionModifier modifier = new EncryptionModifier();
 
     public OFB(EncryptionAlgorithm<K> rootAlgorithm, int cryptableBlockSize) {
         super(rootAlgorithm, cryptableBlockSize);
     }
 
     @Override
-    protected byte[] modifyInput(byte[] openData, byte[] vector, int inputLength) {
-        previousOpenData = openData;
-        return vector;
+    protected Modifier encryptionModifier() {
+        return modifier;
     }
 
     @Override
-    protected byte[] modifyOutput(byte[] encryptedData, byte[] vector, int inputLength) {
-        delegate.setNextBlockVector(encryptedData);
-        return Utils.xor(encryptedData, previousOpenData);
+    protected Modifier decryptionModifier() {
+        return modifier;
     }
 }

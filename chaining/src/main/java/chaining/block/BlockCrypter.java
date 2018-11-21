@@ -2,6 +2,7 @@ package chaining.block;
 
 import chaining.helper.BlockCrypterDelegate;
 import chaining.helper.BlockCrypterVectorProvider;
+import chaining.helper.Modifier;
 import chaining.helper.Resettable;
 import cryptoalgo.EncryptionAlgorithm;
 import lombok.Getter;
@@ -66,12 +67,12 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements 
         // prepare input stream
         byte[] inputBlock = new byte[size];
         int length = openDataIS.read(inputBlock);
-        inputBlock = modifyInput(inputBlock, vector, length);
+        inputBlock = encryptionModifier().firstModification(inputBlock, vector, length);
         // create OutputStream which will hold all encrypted data
         ByteArrayOutputStream outputBlockOS = new ByteArrayOutputStream(size);
         algorithm.encrypt(eKey, new ByteArrayInputStream(inputBlock), outputBlockOS);
         // write encrypted data into desired output
-        byte[] outputBlock = modifyOutput(outputBlockOS.toByteArray(), vector, length);
+        byte[] outputBlock = encryptionModifier().secondModification(outputBlockOS.toByteArray(), vector, length);
         encryptedDataOS.write(Arrays.copyOf(outputBlock, length));
         outputBlockOS.close();
     }
@@ -83,12 +84,12 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements 
         // prepare input stream
         byte[] inputBlock = new byte[size];
         int length = encryptedDataIS.read(inputBlock);
-        inputBlock = modifyOutput(inputBlock, vector, length);
+        inputBlock = decryptionModifier().firstModification(inputBlock, vector, length);
         // create OutputStream which will hold all encrypted data
         ByteArrayOutputStream outputBlockOS = new ByteArrayOutputStream(size);
         algorithm.decrypt(dKey, new ByteArrayInputStream(inputBlock, 0, length), outputBlockOS);
         // write encrypted data into desired output
-        byte[] outputBlock = modifyInput(outputBlockOS.toByteArray(), vector, length);
+        byte[] outputBlock = decryptionModifier().secondModification(outputBlockOS.toByteArray(), vector, length);
         openDataOS.write(Arrays.copyOf(outputBlock, length));
         outputBlockOS.close();
     }
@@ -103,6 +104,6 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> implements 
     //
     //
 
-    protected abstract byte[] modifyInput(byte[] openData, byte[] vector, int inputLength);
-    protected abstract byte[] modifyOutput(byte[] encryptedData, byte[] vector, int inputLength);
+    protected abstract Modifier encryptionModifier();
+    protected abstract Modifier decryptionModifier();
 }
