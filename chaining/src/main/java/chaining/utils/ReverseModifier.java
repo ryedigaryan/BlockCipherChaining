@@ -1,4 +1,4 @@
-package chaining.helper;
+package chaining.utils;
 
 public class ReverseModifier implements Modifier {
 

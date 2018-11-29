@@ -29,34 +29,15 @@ public class CaesarCipher extends EncryptionAlgorithm<Byte> {
      */
     @Override
     public Byte decryptionKey(Byte eKey) {
-        return (byte)(Constants.SYMBOL_MAX - eKey);
+        return normalizeKey(-eKey);
     }
 
     @Override
     public Byte normalizeKey(Object key) throws IllegalArgumentException {
         if(key instanceof Number) {
             Number keyAsNumber = (Number) key;
-            return CaesarCipher.normalizeKey(keyAsNumber.longValue());
+            return (byte)Constants.KEY_RANGE.fit(keyAsNumber.longValue());//CaesarCipher.normalizeKey(keyAsNumber.longValue());
         }
         throw new IllegalArgumentException("key must be Number");
     }
-
-    /**
-     * Normalizes given key, and returns normalized.<br>
-     *     In other words, this function fits key in range [0, 26)
-     * @param key the key, which must be normalized.
-     * @return normalized key.
-     */
-    private static byte normalizeKey(long key) {
-        if(Constants.KEY_MIN <= key && key < Constants.KEY_MAX)
-            return (byte)key;
-        // convert key to fit in acceptable range
-        long inRange = key % Constants.KEY_MAX;
-        // if key is negative, then convert it to positive
-        if(inRange < 0) {
-            return (byte)(Constants.KEY_MAX + inRange);
-        }
-        return (byte)inRange;
-    }
-
 }

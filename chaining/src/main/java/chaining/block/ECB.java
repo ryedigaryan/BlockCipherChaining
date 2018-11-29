@@ -1,6 +1,6 @@
 package chaining.block;
 
-import chaining.helper.Modifier;
+import chaining.utils.Modifier;
 import cryptoalgo.EncryptionAlgorithm;
 
 public class ECB<K> extends BlockCrypter<K> {
@@ -32,6 +32,11 @@ public class ECB<K> extends BlockCrypter<K> {
     @Override
     protected Modifier decryptionModifier() {
         return modifier;
+    }
+
+    @Override
+    protected byte[] getLastGeneratedVector() {
+        return null;
     }
 
 }

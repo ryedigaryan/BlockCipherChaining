@@ -1,4 +1,4 @@
-package chaining.helper;
+package chaining.utils;
 
 public class Utils {
     public static byte[] xor(byte[] a, byte[] b) {

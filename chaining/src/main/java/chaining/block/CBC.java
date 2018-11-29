@@ -1,11 +1,13 @@
 package chaining.block;
 
-import chaining.helper.Modifier;
-import chaining.helper.ReverseModifier;
-import chaining.helper.Utils;
+import chaining.utils.Modifier;
+import chaining.utils.ReverseModifier;
+import chaining.utils.Utils;
 import cryptoalgo.EncryptionAlgorithm;
 
 public class CBC<K> extends BlockCrypter<K> {
+
+    private byte[] lastVector;
 
     private class EncryptionModifier implements Modifier {
         @Override
@@ -15,7 +17,7 @@ public class CBC<K> extends BlockCrypter<K> {
 
         @Override
         public byte[] secondModification(byte[] data, byte[] vector, int inputLength) {
-            delegate.setNextBlockVector(data);
+            lastVector = data;
             return data;
         }
     }
@@ -35,5 +37,10 @@ public class CBC<K> extends BlockCrypter<K> {
     @Override
     protected Modifier decryptionModifier() {
         return dMod;
+    }
+
+    @Override
+    public byte[] getLastGeneratedVector() {
+        return lastVector;
     }
 }

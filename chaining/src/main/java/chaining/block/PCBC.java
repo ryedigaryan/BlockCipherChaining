@@ -1,10 +1,12 @@
 package chaining.block;
 
-import chaining.helper.Modifier;
-import chaining.helper.Utils;
+import chaining.utils.Modifier;
+import chaining.utils.Utils;
 import cryptoalgo.EncryptionAlgorithm;
 
 public class PCBC<K> extends BlockCrypter<K> {
+
+    private byte[] lastVector;
 
     private class EncryptionModifier implements Modifier {
 
@@ -18,7 +20,7 @@ public class PCBC<K> extends BlockCrypter<K> {
 
         @Override
         public byte[] secondModification(byte[] data, byte[] vector, int inputLength) {
-            delegate.setNextBlockVector(Utils.xor(data, plainText));
+            lastVector = Utils.xor(data, plainText);
             return data;
         }
     }
@@ -35,7 +37,7 @@ public class PCBC<K> extends BlockCrypter<K> {
 
         @Override
         public byte[] secondModification(byte[] data, byte[] vector, int inputLength) {
-            delegate.setNextBlockVector(Utils.xor(data, cipherText));
+            lastVector = Utils.xor(data, cipherText);
             return Utils.xor(data, vector);
         }
     }
@@ -55,5 +57,10 @@ public class PCBC<K> extends BlockCrypter<K> {
     @Override
     protected Modifier decryptionModifier() {
         return dMod;
+    }
+
+    @Override
+    public byte[] getLastGeneratedVector() {
+        return lastVector;
     }
 }
