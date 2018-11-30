@@ -1,12 +1,14 @@
 package chaining.utils;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
+@AllArgsConstructor
 public class ReverseModifier implements Modifier {
 
     private Modifier modifier;
-
-    public ReverseModifier(Modifier rootModifier) {
-        modifier = rootModifier;
-    }
 
     @Override
     public byte[] firstModification(byte[] data, byte[] vector, int inputLength) {

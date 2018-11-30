@@ -3,6 +3,7 @@ package chaining.block;
 import chaining.utils.Modifier;
 import cryptoalgo.EncryptionAlgorithm;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.ByteArrayInputStream;
@@ -15,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Getter @Setter
+@NoArgsConstructor
 public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
     private EncryptionAlgorithm<K> algorithm;
     private int blockSize;
