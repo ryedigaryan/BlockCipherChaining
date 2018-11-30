@@ -102,10 +102,8 @@ public class Tester {
 //        ecb.encrypt(openIn, encryptOut);
 //        ecb.decrypt(encryptIn, decryptOut);
 
-        Node<Byte> ecbCI = new Node<>(ecb, 10);
-        ecbCI.setKeyProvider(keyProvider);
-        Node<Byte> ecbCI2 = new Node<>(ecb, 5);
-        ecbCI2.setKeyProvider(keyProvider);
+        Node<Byte> ecbCI = new Node<>(ecb, keyProvider, 10);
+        Node<Byte> ecbCI2 = new Node<>(ecb, keyProvider, 5);
 
         Chain ecbChain = new Chain(null, ecbCI, ecbCI2);
         ecbChain.encrypt(openIn, encryptOut);
