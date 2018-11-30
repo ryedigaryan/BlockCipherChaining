@@ -14,19 +14,19 @@ import java.io.IOException;
 //TODO: THINK ABOUT CHAIN .... FUCK
 public class Tester {
     public static void main(String[] args) throws Throwable {
-//        Tst t = Tst.create();
-//        Constructor<Tst> c = Tst.class.getDeclaredConstructor();
-//        c.setAccessible(true);
-//        Tst t2 = c.newInstance();
-
-
-        Tester t = new Tester();
-//        t.caesarTest();
-        t.shifterTest();
-//        t.ecbTest();
+//        ecbWithShifter();
+        shifter();
     }
 
-    void caesarTest() throws Throwable {
+    static void ecbWithShifter() {
+        BasicShifter bs = new BasicShifter();
+        bs.setKey(-84);
+
+        String basePath = "src/main/resources/BasicShifter/";
+
+    }
+
+    static void caesar() throws Throwable {
         String plain = "abcd, efgh ijkl mnop - qrst uvw xyz **ABCD EFGH I#JKL) MNOP QRST UVW XYZ1234";
         String expect = "efgh, ijkl mnop qrst - uvwx yza bcd **EFGH IJKL M#NOP) QRST UVWX YZA BCD1234";
 
@@ -45,10 +45,7 @@ public class Tester {
         }
     }
 
-    void shifterTest() throws IOException {
-        String plain = "abcd, efgh ijkl mnop - qrst uvw xyz **ABCD EFGH I#JKL) MNOP QRST UVW XYZ1234";
-        String expect = "efgh, ijkl mnop qrst - uvwx yza bcd **EFGH IJKL M#NOP) QRST UVWX YZA BCD1234";
-
+    static void shifter() throws IOException {
         BasicShifter bs = new BasicShifter();
         bs.setKey(-84);
 
@@ -72,7 +69,7 @@ public class Tester {
         }
     }
 
-    private void ecbTest() throws Throwable {
+    static private void ecb() throws Throwable {
 
         String plain = "abcd, efgh ijkl mnop - qrst uvw xyz **ABCD EFGH I#JKL) MNOP QRST UVW XYZ1234";
         String expect = "efgh, ijkl mnop qrst - uvwx yza bcd **EFGH IJKL M#NOP) QRST UVWX YZA BCD1234";
