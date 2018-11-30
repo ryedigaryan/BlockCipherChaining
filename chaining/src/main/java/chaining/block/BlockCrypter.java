@@ -26,7 +26,7 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
      * The block which size is less than {@link #blockSize} (mainly last one) will be filled with this byte,
      * till it's size smaller than {@link #blockSize}
      */
-    //TODO: change this to Byte, so when fil == null => no fill will be made
+    //TODO: change this to Byte, so when fill == null => no fill will be made
     private byte fill;
 
     public BlockCrypter(EncryptionAlgorithm<K> algorithm, int cryptableBlockSize) {

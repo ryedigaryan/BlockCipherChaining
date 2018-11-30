@@ -25,7 +25,6 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
     private List<Node> nodes;
 
     private byte[] lastGeneratedVector;
-    private Supplier<byte[]> vectorSupplier;
 
     public Chain() {}
 
@@ -41,7 +40,7 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
 
     @Override
     public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-        vectorSupplier = new InitialVectorSupplier();
+        lastGeneratedVector = initialVector;
 
         while (openDataIS.available() > 0) {
             for (Node node : nodes) {
@@ -49,13 +48,12 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
             }
         }
 
-        vectorSupplier = null;
         System.out.println("Chain - encrypt - done");
     }
 
     @Override
     public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-        vectorSupplier = new InitialVectorSupplier();
+        lastGeneratedVector = initialVector;
 
         while (encryptedDataIS.available() > 0) {
             for (Node node : nodes) {
@@ -63,7 +61,6 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
             }
         }
 
-        vectorSupplier = null;
         System.out.println("Chain - decrypt - done");
     }
 
@@ -74,7 +71,7 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
 
     @Override
     public byte[] get() {
-        return vectorSupplier.get();
+        return lastGeneratedVector;
     }
 
     ///////////////////////////////////
@@ -113,21 +110,6 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
         @Override
         public void reset() {
             keyProvider.reset();
-        }
-    }
-
-    private class InitialVectorSupplier implements Supplier<byte[]> {
-        @Override
-        public byte[] get() {
-            vectorSupplier = new LastGeneratedVectorSupplier();
-            return initialVector;
-        }
-    }
-
-    private class LastGeneratedVectorSupplier implements Supplier<byte[]> {
-        @Override
-        public byte[] get() {
-            return lastGeneratedVector;
         }
     }
 }
