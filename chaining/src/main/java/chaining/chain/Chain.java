@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
+public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]>, Resettable {
 
     @Getter @Setter
     private byte[] initialVector;
@@ -72,6 +72,13 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]> {
     @Override
     public byte[] get() {
         return lastGeneratedVector;
+    }
+
+    @Override
+    public void reset() {
+        for (Node node : getNodes()) {
+            node.reset();
+        }
     }
 
     ///////////////////////////////////
