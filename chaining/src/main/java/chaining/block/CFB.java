@@ -3,7 +3,9 @@ package chaining.block;
 import chaining.utils.Modifier;
 import chaining.utils.Utils;
 import cryptoalgo.EncryptionAlgorithm;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class CFB<K> extends BlockCrypter<K> {
 
     private byte[] lastVector;
@@ -44,8 +46,8 @@ public class CFB<K> extends BlockCrypter<K> {
     private final EncryptionModifier eMod = new EncryptionModifier();
     private final DecryptionModifier dMod = new DecryptionModifier();
 
-    public CFB(EncryptionAlgorithm<K> rootAlgorithm, int cryptableBlockSize) {
-        super(rootAlgorithm, cryptableBlockSize);
+    public CFB(EncryptionAlgorithm<K> rootAlgorithm) {
+        super(rootAlgorithm);
     }
 
     @Override

@@ -4,7 +4,9 @@ import chaining.utils.Modifier;
 import chaining.utils.ReverseModifier;
 import chaining.utils.Utils;
 import cryptoalgo.EncryptionAlgorithm;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class CBC<K> extends BlockCrypter<K> {
 
     private byte[] lastVector;
@@ -25,8 +27,8 @@ public class CBC<K> extends BlockCrypter<K> {
     private final EncryptionModifier eMod = new EncryptionModifier();
     private final ReverseModifier dMod = new ReverseModifier(eMod);
 
-    public CBC(EncryptionAlgorithm<K> rootAlgorithm, int cryptableBlockSize) {
-        super(rootAlgorithm, cryptableBlockSize);
+    public CBC(EncryptionAlgorithm<K> rootAlgorithm) {
+        super(rootAlgorithm);
     }
 
     @Override

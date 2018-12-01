@@ -44,9 +44,11 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]>, Resett
         System.out.println("Chain - encrypt - START");
         lastGeneratedVector = initialVector;
 
-        // ask each node to make enscription till there is any available data
-        for (int i = 0; i < nodes.size() && openDataIS.available() > 0; i++) {
-            nodes.get(i).encrypt(openDataIS, encryptedDataOS);
+        // we should repeat each node's encryption till there is any available data
+        while(openDataIS.available() > 0) {
+            for (Node node : nodes) {
+                node.encrypt(openDataIS, encryptedDataOS);
+            }
         }
 
         System.out.println("Chain - encrypt - DONE");
@@ -58,9 +60,11 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]>, Resett
 
         lastGeneratedVector = initialVector;
 
-        // ask each node to make description till there is any available data
-        for(int i = 0; i < nodes.size() && encryptedDataIS.available() > 0; i++) {
-            nodes.get(i).decrypt(encryptedDataIS, openDataOS);
+        // we should repeat each node's decryption till there is any available data
+        while(encryptedDataIS.available() > 0) {
+            for (Node node : nodes) {
+                node.decrypt(encryptedDataIS, openDataOS);
+            }
         }
 
         System.out.println("Chain - decrypt - DONE");
@@ -93,19 +97,40 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]>, Resett
     public static class Node<K> implements Cipher, Resettable {
         private BlockCrypter<K> blockCrypter;
         private BlockCrypterKeyProvider<K> keyProvider;
-        private int executionCount;
+        private Integer executionCount;
 
         @Override
         public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-            for(int i = 0; i < executionCount && openDataIS.available() > 0; i++) {
-                blockCrypter.encrypt(keyProvider.get(), openDataIS, encryptedDataOS);
+            if(executionCount == -1) {
+                // if executionCount is -1 then we should perform encryption until all the data is read
+                while (openDataIS.available() > 0) {
+                    blockCrypter.encrypt(keyProvider.get(), openDataIS, encryptedDataOS);
+                }
+            }
+            else {
+                // if executionCount is not -1, then we should perform only finite number encryption operations
+                // and only if there is any available data
+                for (int i = 0; i < executionCount && openDataIS.available() > 0; i++) {
+                    blockCrypter.encrypt(keyProvider.get(), openDataIS, encryptedDataOS);
+                }
             }
         }
 
         @Override
         public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-            for(int i = 0; i < executionCount && encryptedDataIS.available() > 0; i++) {
-                blockCrypter.decrypt(keyProvider.get(), encryptedDataIS, openDataOS);
+            if(executionCount == -1) {
+                // if executionCount is -1 then we should perform decryption until all the data is read
+                while (encryptedDataIS.available() > 0) {
+                    blockCrypter.decrypt(keyProvider.get(), encryptedDataIS, openDataOS);
+                }
+            }
+            else {
+                // if executionCount is not -1, then we should perform only finite number decryption operations
+                // and only if there is any available data
+                for (int i = 0; i < executionCount && encryptedDataIS.available() > 0; i++) {
+                    blockCrypter.decrypt(keyProvider.get(), encryptedDataIS, openDataOS);
+                }
+
             }
         }
 

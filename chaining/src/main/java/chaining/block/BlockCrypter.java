@@ -4,6 +4,8 @@ import chaining.utils.Modifier;
 import cryptoalgo.EncryptionAlgorithm;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.io.ByteArrayInputStream;
@@ -17,24 +19,19 @@ import java.util.function.Supplier;
 
 @Getter @Setter
 @NoArgsConstructor
+@RequiredArgsConstructor
 public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
+    @NonNull
     private EncryptionAlgorithm<K> algorithm;
-    private int blockSize;
 
     private Supplier<byte[]> vectorProvider;
     private Consumer<byte[]> vectorStorage;
 
     /**
-     * The block which size is less than {@link #blockSize} (mainly last one) will be filled with this byte,
-     * till it's size smaller than {@link #blockSize}
+     * The block which size is less than cryptable block size (mainly last one) will be filled with this byte
      */
     //TODO: change this to Byte, so when fill == null => no fill will be made
     private byte fill;
-
-    public BlockCrypter(EncryptionAlgorithm<K> algorithm, int cryptableBlockSize) {
-        this.algorithm = algorithm;
-        this.blockSize = cryptableBlockSize;
-    }
 
     //
     // EncryptionAlgorithm
@@ -72,7 +69,7 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
     @Override
     protected void applyEncryptionAlgorithm(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
         byte[] vector = vectorProvider.get();
-        int size = getBlockSize();
+        int size = vector.length;
         // prepare input stream
         byte[] inputBlock = new byte[size];
         fillMissingBytes(inputBlock, openDataIS.read(inputBlock));
@@ -90,7 +87,7 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
     @Override
     protected void applyDecryptionAlgorithm(K dKey, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
         byte[] vector = vectorProvider.get();
-        int size = getBlockSize();
+        int size = vector.length;
         // prepare input stream
         byte[] inputBlock = new byte[size];
         // in theory there should be no case when the read length is less than cryptable block size

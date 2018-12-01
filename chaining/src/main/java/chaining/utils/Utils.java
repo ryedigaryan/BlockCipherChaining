@@ -4,8 +4,9 @@ public class Utils {
     public static byte[] xor(byte[] a, byte[] b) {
         assert a.length == b.length : "xor operands must have same length";
 
-        byte[] r = new byte[a.length];
-        for(int i = 0; i < a.length; i++) {
+        int min = Math.min(a.length, b.length);
+        byte[] r = new byte[min];
+        for(int i = 0; i < min; i++) {
             r[i] = (byte) (a[i] ^ b[i]);
         }
         return r;

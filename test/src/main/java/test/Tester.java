@@ -1,29 +1,129 @@
 package test;
 
+import chaining.block.BlockCrypter;
+import chaining.block.CBC;
+import chaining.block.CFB;
 import chaining.block.ECB;
+import chaining.block.OFB;
+import chaining.block.PCBC;
 import chaining.chain.Chain;
 import chaining.chain.Chain.Node;
 import chaining.utils.BlockCrypterKeyProvider;
 import cryptoalgo.byteshuffle.BasicShifter;
 import cryptoalgo.caesar.CaesarCipher;
 
+import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-//TODO: THINK ABOUT CHAIN .... FUCK
 public class Tester {
+    static BlockCrypterKeyProvider<Integer> kp = new BlockCrypterKeyProvider<Integer>() {
+        @Override
+        public void reset() {
+
+        }
+
+        @Override
+        public Integer get() {
+            return -84;
+        }
+    };
+
     public static void main(String[] args) throws Throwable {
+        JOptionPane.showInputDialog("FUCK");
+
+//        shifter();
+//        BasicShifter._count = 0;
 //        ecbWithShifter();
-        shifter();
+//        nodesWithShifter(new CBC<>());
+        diverseNodesWithShifter();
     }
 
-    static void ecbWithShifter() {
-        BasicShifter bs = new BasicShifter();
-        bs.setKey(-84);
+    static void nodesWithShifter(BlockCrypter<Integer> blockCrypter) throws IOException {
 
         String basePath = "src/main/resources/BasicShifter/";
 
+
+        BasicShifter bs = new BasicShifter();
+        blockCrypter.setAlgorithm(bs);
+        blockCrypter.setFill((byte) 8);
+        BlockCrypterKeyProvider<Integer> kp = new BlockCrypterKeyProvider<Integer>() {
+            @Override
+            public void reset() {
+
+            }
+
+            @Override
+            public Integer get() {
+                return -84;
+            }
+        };
+
+        Node<Integer> node = new Node<>(blockCrypter, kp, 1);
+
+        byte[] initialVector = {0, 1, 2};
+        Chain chain = new Chain(initialVector, node);
+
+        /// encrypt
+        FileInputStream openIn = new FileInputStream(basePath + "OpenData.txt");
+        FileOutputStream encryptOut = new FileOutputStream(basePath + "Encrypted.txt");
+
+        chain.encrypt(openIn, encryptOut);
+        openIn.close();
+        encryptOut.close();
+
+        chain.reset();
+        /// decrypt
+        FileInputStream encryptIn = new FileInputStream(basePath + "Encrypted.txt");
+        FileOutputStream decryptOut = new FileOutputStream(basePath + "Decrypted.txt");
+
+        chain.decrypt(encryptIn, decryptOut);
+        encryptIn.close();
+        decryptOut.close();
+
+    }
+
+    static void diverseNodesWithShifter() throws IOException {
+
+        String basePath = "src/main/resources/BasicShifter/";
+
+        BasicShifter bs = new BasicShifter();
+
+        Node[] nodes = new Node[] {
+                new Node<>(new CBC<Integer>(), kp, 1),
+//                new Node<>(new ECB<Integer>(), kp, 1),
+//                new Node<>(new OFB<Integer>(), kp, 1),
+//                new Node<>(new CFB<Integer>(), kp, 1),
+                new Node<>(new PCBC<Integer>(), kp, 2),
+                new Node<>(new CFB<Integer>(), kp, 3),
+        };
+
+        for (int i = 0; i < nodes.length; i++) {
+            Node node = nodes[i];
+            node.getBlockCrypter().setAlgorithm(bs);
+            node.getBlockCrypter().setFill((byte) 8);
+        }
+
+        byte[] initialVector = {0, 1, 2, 3, 9, 24, 99};
+        Chain chain = new Chain(initialVector, nodes);
+
+        /// encrypt
+        FileInputStream openIn = new FileInputStream(basePath + "OpenData.txt");
+        FileOutputStream encryptOut = new FileOutputStream(basePath + "Encrypted.txt");
+
+        chain.encrypt(openIn, encryptOut);
+        openIn.close();
+        encryptOut.close();
+
+        chain.reset();
+        /// decrypt
+        FileInputStream encryptIn = new FileInputStream(basePath + "Encrypted.txt");
+        FileOutputStream decryptOut = new FileOutputStream(basePath + "Decrypted.txt");
+
+        chain.decrypt(encryptIn, decryptOut);
+        encryptIn.close();
+        decryptOut.close();
     }
 
     static void caesar() throws Throwable {
@@ -46,8 +146,7 @@ public class Tester {
     }
 
     static void shifter() throws IOException {
-        BasicShifter bs = new BasicShifter();
-        bs.setKey(-84);
+        BasicShifter bs = new BasicShifter(-84);
 
         String basePath = "src/main/resources/BasicShifter/";
 
@@ -57,15 +156,19 @@ public class Tester {
         try(FileInputStream openIn = new FileInputStream(basePath + "OpenData.txt");
             FileOutputStream encryptOut = new FileOutputStream(basePath + "Encrypted.txt")) {
 
-            while(openIn.available() > 0)
+            System.out.println("BasicShifter - encrypt - START");
+//            while(openIn.available() > 0)
             bs.encrypt(openIn, encryptOut);
+            System.out.println("BasicShifter - encrypt - DONE");
 
         }
 
         try(FileInputStream encryptIn = new FileInputStream(basePath + "Encrypted.txt");
             FileOutputStream decryptOut = new FileOutputStream(basePath + "Decrypted.txt")) {
-            while(encryptIn.available() > 0)
-                bs.decrypt(encryptIn, decryptOut);
+            System.out.println("BasicShifter - decrypt - START");
+//            while(encryptIn.available() > 0)
+            bs.decrypt(encryptIn, decryptOut);
+            System.out.println("BasicShifter - decrypt - DONE");
         }
     }
 
@@ -84,7 +187,7 @@ public class Tester {
 
         CaesarCipher cc = new CaesarCipher();
 //        cc.setKey(-22L);
-        ECB<Byte> ecb = new ECB<>(cc, 1);
+        ECB<Byte> ecb = new ECB<>(cc);
         BlockCrypterKeyProvider<Byte> keyProvider = new BlockCrypterKeyProvider<Byte>() {
             public Byte get() {
                 System.out.println(getClass() + " provides next key");
@@ -111,15 +214,5 @@ public class Tester {
         encryptIn.close();
         decryptOut.close();
 
-    }
-}
-
-class Tst {
-    private Tst() {
-        System.out.println("in a private constructor");
-    }
-
-    public static Tst create() {
-        return new Tst();
     }
 }

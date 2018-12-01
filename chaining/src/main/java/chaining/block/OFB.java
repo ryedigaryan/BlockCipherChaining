@@ -3,7 +3,9 @@ package chaining.block;
 import chaining.utils.Modifier;
 import chaining.utils.Utils;
 import cryptoalgo.EncryptionAlgorithm;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class OFB<K> extends BlockCrypter<K> {
 
     private byte[] lastVector;
@@ -26,8 +28,8 @@ public class OFB<K> extends BlockCrypter<K> {
 
     private final EncryptionModifier modifier = new EncryptionModifier();
 
-    public OFB(EncryptionAlgorithm<K> rootAlgorithm, int cryptableBlockSize) {
-        super(rootAlgorithm, cryptableBlockSize);
+    public OFB(EncryptionAlgorithm<K> rootAlgorithm) {
+        super(rootAlgorithm);
     }
 
     @Override

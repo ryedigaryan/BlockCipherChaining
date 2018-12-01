@@ -1,17 +1,18 @@
 package cryptoalgo.byteshuffle;
 
 import cryptoalgo.EncryptionAlgorithm;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 //TODO: add support for choosing an encryptable block size in bits
+@NoArgsConstructor
 public class BasicShifter extends EncryptionAlgorithm<Integer> {
 
-    @Override
-    public void setKey(Object key) {
-        super.setKey(key);
+    public BasicShifter(Number key) {
+        setKey(key);
     }
 
     @Override
@@ -39,13 +40,15 @@ public class BasicShifter extends EncryptionAlgorithm<Integer> {
 
     @Override
     protected void applyEncryptionAlgorithm(Integer eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-        int data = openDataIS.read();
-        int frontBits = (data & mask(eKey));
-        // 8 is bits count in a byte
-        frontBits <<= 8 - eKey;
-        data >>= eKey;
-        data |= frontBits;
-        encryptedDataOS.write(data);
+        int data;
+        while((data = openDataIS.read()) >= 0) {
+            int frontBits = (data & mask(eKey));
+            // 8 is bits count in a byte
+            frontBits <<= 8 - eKey;
+            data >>= eKey;
+            data |= frontBits;
+            encryptedDataOS.write(data);
+        }
     }
 
     @Override
