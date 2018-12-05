@@ -1,24 +1,15 @@
 package rub.labs.ui;
 
+import rub.labs.ui.windows.main.MainWindow;
+
 import javax.swing.*;
 
-public class ChaincryptMainApp extends JFrame {
+public class ChaincryptMainApp {
 
-    public static void main(String[] args) {
-        ChaincryptMainApp ex = new ChaincryptMainApp();
-        ex.setVisible(true);
+    public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        MainWindow mainWindow = new MainWindow();
+        mainWindow.setVisible(true);
     }
 
-    public ChaincryptMainApp() {
-        setTitle("Chaincrypt - by Ruddy");
-        setSize(300, 200);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-    }
-
-    @Override
-    protected void frameInit() {
-        super.frameInit();
-//        UIManager.getColor()
-    }
 }
