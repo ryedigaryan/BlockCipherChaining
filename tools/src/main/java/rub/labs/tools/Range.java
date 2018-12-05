@@ -1,4 +1,4 @@
-package helpers;
+package rub.labs.tools;
 
 import lombok.Getter;
 import lombok.Setter;

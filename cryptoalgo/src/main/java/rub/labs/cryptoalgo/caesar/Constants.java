@@ -1,6 +1,6 @@
 package rub.labs.cryptoalgo.caesar;
 
-import helpers.Range;
+import rub.labs.tools.Range;
 
 class Constants {
     static final byte UPPERCASE_MIN = 'A';

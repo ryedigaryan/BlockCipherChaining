@@ -1,4 +1,4 @@
-package helpers.handlers;
+package rub.labs.tools.handlers;
 
 @FunctionalInterface
 public interface ThrowingConsumer<T, E extends Exception> {

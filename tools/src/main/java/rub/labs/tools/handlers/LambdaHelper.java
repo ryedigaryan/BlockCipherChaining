@@ -1,4 +1,4 @@
-package helpers.handlers;
+package rub.labs.tools.handlers;
 
 import java.util.function.Consumer;
 

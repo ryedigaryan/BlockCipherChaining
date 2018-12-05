@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>helpers</artifactId>
+    <artifactId>tools</artifactId>
     <description>Helper classes which can be used in any project as well</description>
 
     <build>
