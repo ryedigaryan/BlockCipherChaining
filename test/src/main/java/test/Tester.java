@@ -176,7 +176,6 @@ public class Tester {
 
         String plain = "abcd, efgh ijkl mnop - qrst uvw xyz **ABCD EFGH I#JKL) MNOP QRST UVW XYZ1234";
         String expect = "efgh, ijkl mnop qrst - uvwx yza bcd **EFGH IJKL M#NOP) QRST UVWX YZA BCD1234";
-
         String basePath = "src/main/resources/Caesar/";
 
         FileInputStream openIn = new FileInputStream(basePath + "OpenData.txt");
