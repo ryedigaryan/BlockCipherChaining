@@ -1,19 +1,18 @@
 package rub.labs.chaining.chain;
 
-import rub.labs.chaining.block.BlockCrypter;
-import rub.labs.chaining.utils.BlockCrypterKeyProvider;
-import rub.labs.chaining.utils.Resettable;
-import rub.labs.cryptoalgo.Cipher;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rub.labs.chaining.block.BlockCrypter;
+import rub.labs.chaining.utils.BlockCrypterKeyProvider;
+import rub.labs.chaining.utils.Resettable;
+import rub.labs.cryptoalgo.Cipher;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -25,23 +24,29 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]>, Resett
     private byte[] initialVector;
 
     @Getter @Setter
-    private List<Node> nodes;
+    private List<Node> nodes = new ArrayList<>();
 
     private byte[] lastGeneratedVector;
 
     public Chain(byte[] initialVector, Node... nodes) {
         this.initialVector = initialVector;
-        this.nodes = new ArrayList<>(Arrays.asList(nodes));
 
         for (Node node : nodes) {
-            node.getBlockCrypter().setVectorProvider(this);
-            node.getBlockCrypter().setVectorStorage(this);
+            addNode(node);
         }
+    }
+
+    public void addNode(Node node) {
+        nodes.add(node);
+        node.getBlockCrypter().setVectorProvider(this);
+        node.getBlockCrypter().setVectorStorage(this);
     }
 
     @Override
     public void encrypt(InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
         System.out.println("Chain - encrypt - START");
+
+        reset();
         lastGeneratedVector = initialVector;
 
         // we should repeat each node's encryption till there is any available data
@@ -58,6 +63,7 @@ public class Chain implements Cipher, Supplier<byte[]>, Consumer<byte[]>, Resett
     public void decrypt(InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
         System.out.println("Chain - decrypt - START");
 
+        reset();
         lastGeneratedVector = initialVector;
 
         // we should repeat each node's decryption till there is any available data

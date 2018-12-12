@@ -1,12 +1,12 @@
 package rub.labs.chaining.block;
 
+import lombok.NoArgsConstructor;
 import rub.labs.chaining.utils.Modifier;
 import rub.labs.chaining.utils.Utils;
 import rub.labs.cryptoalgo.EncryptionAlgorithm;
-import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class CFB<K> extends BlockCrypter<K> {
+public class CFB<K> extends EncryptorBlockCrypter<K> {
 
     private byte[] lastVector;
 
@@ -38,8 +38,7 @@ public class CFB<K> extends BlockCrypter<K> {
 
         @Override
         public byte[] secondModification(byte[] data, byte[] vector, int inputLength) {
-            lastVector = cipherText;
-            return Utils.xor(data, cipherText);
+            return Utils.xor(data, lastVector = cipherText);
         }
     }
 

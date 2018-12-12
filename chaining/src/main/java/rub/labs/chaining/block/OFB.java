@@ -1,12 +1,12 @@
 package rub.labs.chaining.block;
 
+import lombok.NoArgsConstructor;
 import rub.labs.chaining.utils.Modifier;
 import rub.labs.chaining.utils.Utils;
 import rub.labs.cryptoalgo.EncryptionAlgorithm;
-import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class OFB<K> extends BlockCrypter<K> {
+public class OFB<K> extends EncryptorBlockCrypter<K> {
 
     private byte[] lastVector;
 

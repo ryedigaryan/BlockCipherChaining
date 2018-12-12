@@ -68,7 +68,7 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
     //TODO: pass here the block and return block instead of streams in encrypt(...) methods write response into ostream
     @Override
     protected void applyEncryptionAlgorithm(K eKey, InputStream openDataIS, OutputStream encryptedDataOS) throws IOException {
-        byte[] vector = vectorProvider.get();
+        byte[] vector = getVectorProvider().get();
         int size = vector.length;
         // prepare input stream
         byte[] inputBlock = new byte[size];
@@ -76,17 +76,17 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
         inputBlock = encryptionModifier().firstModification(inputBlock, vector, size);
         // create OutputStream which will hold all encrypted data
         ByteArrayOutputStream outputBlockOS = new ByteArrayOutputStream(size);
-        algorithm.encrypt(eKey, new ByteArrayInputStream(inputBlock), outputBlockOS);
+        getAlgorithm().encrypt(eKey, new ByteArrayInputStream(inputBlock), outputBlockOS);
         // write encrypted data into desired output
         byte[] outputBlock = encryptionModifier().secondModification(outputBlockOS.toByteArray(), vector, size);
         encryptedDataOS.write(Arrays.copyOf(outputBlock, size));
         outputBlockOS.close();
-        vectorStorage.accept(getLastGeneratedVector());
+        getVectorStorage().accept(getLastGeneratedVector());
     }
 
     @Override
     protected void applyDecryptionAlgorithm(K dKey, InputStream encryptedDataIS, OutputStream openDataOS) throws IOException {
-        byte[] vector = vectorProvider.get();
+        byte[] vector = getVectorProvider().get();
         int size = vector.length;
         // prepare input stream
         byte[] inputBlock = new byte[size];
@@ -95,15 +95,15 @@ public abstract class BlockCrypter<K> extends EncryptionAlgorithm<K> {
         inputBlock = decryptionModifier().firstModification(inputBlock, vector, size);
         // create OutputStream which will hold all encrypted data
         ByteArrayOutputStream outputBlockOS = new ByteArrayOutputStream(size);
-        algorithm.decrypt(dKey, new ByteArrayInputStream(inputBlock, 0, size), outputBlockOS);
+        getAlgorithm().decrypt(dKey, new ByteArrayInputStream(inputBlock, 0, size), outputBlockOS);
         // write encrypted data into desired output
         byte[] outputBlock = decryptionModifier().secondModification(outputBlockOS.toByteArray(), vector, size);
         openDataOS.write(Arrays.copyOf(outputBlock, size));
         outputBlockOS.close();
-        vectorStorage.accept(getLastGeneratedVector());
+        getVectorStorage().accept(getLastGeneratedVector());
     }
 
-    private void fillMissingBytes(final byte[] bytes, int startIndex) {
+    void fillMissingBytes(final byte[] bytes, int startIndex) {
         while(startIndex < bytes.length) {
             bytes[startIndex] = fill;
             startIndex++;

@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class RandomNumberKeyProvider implements BlockCrypterKeyProvider {
+public class RandomNumberKeyProvider implements BlockCrypterKeyProvider<Integer> {
 
     private final long range;
 
-    private final ArrayList<Long> mainKeyStorage = new ArrayList<>();
-    private Iterator<Long> keyStorageIterator = mainKeyStorage.iterator();
+    private final ArrayList<Integer> mainKeyStorage = new ArrayList<>();
+    private Iterator<Integer> keyStorageIterator = mainKeyStorage.iterator();
 
-    private LinkedList<Long> generatedKeyStorage = new LinkedList<>();
+    private LinkedList<Integer> generatedKeyStorage = new LinkedList<>();
 
     public RandomNumberKeyProvider() {
-        this(Long.MAX_VALUE);
+        this(Integer.MAX_VALUE);
     }
 
     public RandomNumberKeyProvider(long positiveRange) {
@@ -22,8 +22,8 @@ public class RandomNumberKeyProvider implements BlockCrypterKeyProvider {
     }
 
     @Override
-    public Object get() {
-        final Long randomKey;
+    public Integer get() {
+        final Integer randomKey;
         if(keyStorageIterator.hasNext()) {
             System.out.println("RandomNumberKeyProvider: providing existing key");
             randomKey = keyStorageIterator.next();
@@ -44,9 +44,9 @@ public class RandomNumberKeyProvider implements BlockCrypterKeyProvider {
         generatedKeyStorage = new LinkedList<>();
     }
 
-    private Long generateRandomKey() {
+    private Integer generateRandomKey() {
         return Math.random() > 0 ?
-                (long) (Math.random() * range):
-                (long) (Math.random() * -range);
+                (int) (Math.random() * range):
+                (int) (Math.random() * -range);
     }
 }
