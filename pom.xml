@@ -11,7 +11,6 @@
     <modules>
         <module>chaining</module>
         <module>cryptoalgo</module>
-        <module>test</module>
         <module>tools</module>
         <module>ui</module>
     </modules>
